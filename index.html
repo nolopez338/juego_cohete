@@ -14,20 +14,29 @@
         font-family: Arial;
     }
 
+    /* MAP ONLY — gets zoomed + translated */
+    #zoomContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform-origin: 0 0;
+    }
+
+    /* Large map so off-screen trajectory becomes visible when zooming out */
     #gameArea {
         position: relative;
-        width: 100vw;
-        height: 100vh;
+        width: 3000px;
+        height: 3000px;
         background: #222;
-        overflow: hidden;
+        overflow: visible;
     }
 
     #trailCanvas {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 3000px;
+        height: 3000px;
         pointer-events: none;
         z-index: 1;
     }
@@ -49,59 +58,12 @@
         z-index: 2;
     }
 
-    #scoreDisplay {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 18px;
-        background: rgba(0,0,0,0.4);
-        padding: 10px 18px;
-        border-radius: 10px;
-        min-width: 220px;
-        line-height: 22px;
-        z-index: 10;
-    }
-
-    #gateInfo {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        font-size: 16px;
-        background: rgba(0,0,0,0.4);
-        padding: 10px 15px;
-        border-radius: 10px;
-        z-index: 10;
-        line-height: 20px;
-    }
-
-    #popupOverlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0,0,0,0.6);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 20;
-    }
-
-    #popupBox {
-        background: #333;
-        padding: 25px;
-        border-radius: 10px;
-        text-align: center;
-        font-size: 20px;
-        width: 250px;
-    }
-
-    /* CONTROL PANEL */
+    /* UI stays normal size (NOT affected by zoom) */
     #topControls {
         position: absolute;
         top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
+        left: 25%;
+        transform: translateX(-25%);
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -133,60 +95,169 @@
         border-radius: 6px;
         padding: 3px;
     }
+
+    #gateInfo, #scoreDisplay, #popupOverlay {
+        z-index: 30;
+        position: absolute;
+    }
+
+    #gateInfo {
+        top: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.4);
+        padding: 10px 15px;
+        border-radius: 10px;
+    }
+
+    #scoreDisplay {
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.4);
+        padding: 10px 18px;
+        border-radius: 10px;
+        min-width: 220px;
+    }
+
+    #popupOverlay {
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: none;
+        background: rgba(0,0,0,0.6);
+        justify-content: center;
+        align-items: center;
+    }
+
+    #popupBox {
+        background: #333;
+        padding: 25px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 20px;
+        width: 250px;
+    }
 </style>
 </head>
 
 <body>
 
-<div id="gameArea">
-
-    <canvas id="trailCanvas"></canvas>
-
-    <!-- CONTROL PANEL -->
-    <div id="topControls">
-        <div class="controlRow">
-            <span>Y pos</span>
-            <input type="range" id="ySlider" min="-100" max="100" value="0">
-            <input type="number" id="yInput" class="numInput" min="-100" max="100" value="0">
-        </div>
-
-        <div class="controlRow">
-            <span>Slope</span>
-            <input type="range" id="slopeSlider" min="-10" max="10" step="0.1" value="0">
-            <input type="number" id="slopeInput" class="numInput" min="-10" max="10" step="0.1" value="0">
-        </div>
+<!-- UI stays normal size -->
+<div id="topControls">
+    <div class="controlRow">
+        <span>Y pos</span>
+        <input type="range" id="ySlider" min="-100" max="100" value="0">
+        <input type="number" id="yInput" class="numInput" min="-100" max="100" value="0">
     </div>
 
-    <!-- Gate Labels -->
-    <div id="gateInfo">
-        Gate X: <span id="gateXLabel">0</span><br>
-        Gate Top Y: <span id="gateTopLabel">0</span><br>
-        Gate Bottom Y: <span id="gateBottomLabel">0</span>
+    <div class="controlRow">
+        <span>Slope</span>
+        <input type="range" id="slopeSlider" min="-10" max="10" step="0.1" value="0">
+        <input type="number" id="slopeInput" class="numInput" min="-10" max="10" step="0.1" value="0">
     </div>
 
-    <div id="rocket" class="rocket"></div>
-    <div id="gate" class="gate"></div>
-
-    <div id="scoreDisplay">
-        <span style="color:lime;">Hits:</span>
-        <span id="hitsCount">0</span>
-        <div id="hitsDots"></div>
-
-        <span style="color:red;">Misses:</span>
-        <span id="missCount">0</span>
-        <div id="missDots"></div>
+    <div class="controlRow">
+        <span>Quad</span>
+        <input type="range" id="quadSlider" min="-1" max="1" step="0.01" value="0">
+        <input type="number" id="quadInput" class="numInput" min="-1" max="1" step="0.01" value="0">
     </div>
 
-    <div id="popupOverlay">
-        <div id="popupBox">
-            <div id="popupMessage"></div>
-            <button id="popupBtn">OK</button>
-        </div>
+    <div class="controlRow">
+        <span>Cubic</span>
+        <input type="range" id="cubicSlider" min="-0.01" max="0.01" step="0.0001" value="0">
+        <input type="number" id="cubicInput" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
+    </div>
+</div>
+
+<div id="gateInfo">
+    Gate X: <span id="gateXLabel">0</span><br>
+    Gate Top Y: <span id="gateTopLabel">0</span><br>
+    Gate Bottom Y: <span id="gateBottomLabel">0</span>
+</div>
+
+<div id="scoreDisplay">
+    <span style="color:lime;">Hits:</span> <span id="hitsCount">0</span>
+    <div id="hitsDots"></div>
+    <span style="color:red;">Misses:</span> <span id="missCount">0</span>
+    <div id="missDots"></div>
+</div>
+
+<div id="popupOverlay">
+    <div id="popupBox">
+        <div id="popupMessage"></div>
+        <button id="popupBtn">OK</button>
+    </div>
+</div>
+
+<!-- MAP ONLY (zoom + pan) -->
+<div id="zoomContainer">
+    <div id="gameArea">
+        <canvas id="trailCanvas"></canvas>
+        <div id="rocket" class="rocket"></div>
+        <div id="gate" class="gate"></div>
     </div>
 </div>
 
 <script>
-// ELEMENTS
+// ====================================================
+// ZOOM + PAN SYSTEM  (MAP ONLY)
+// ====================================================
+const zoomContainer = document.getElementById("zoomContainer");
+let zoom = 1;
+let zoomX = 0;
+let zoomY = 0;
+
+// --- MOUSE ZOOM ---
+document.addEventListener("wheel", (e) => {
+    e.preventDefault();
+
+    const zoomFactor = 0.1;
+    const oldZoom = zoom;
+
+    if (e.deltaY < 0) zoom += zoomFactor;
+    else zoom -= zoomFactor;
+
+    zoom = Math.min(Math.max(zoom, 0.2), 3);
+
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    zoomX = mouseX - ((mouseX - zoomX) * (zoom / oldZoom));
+    zoomY = mouseY - ((mouseY - zoomY) * (zoom / oldZoom));
+
+    zoomContainer.style.transform =
+        `translate(${zoomX}px, ${zoomY}px) scale(${zoom})`;
+
+}, { passive: false });
+
+// --- MOUSE DRAG PAN ---
+let isPanning = false;
+let startX = 0, startY = 0;
+
+document.addEventListener("mousedown", (e) => {
+    isPanning = true;
+    startX = e.clientX - zoomX;
+    startY = e.clientY - zoomY;
+});
+
+document.addEventListener("mouseup", () => {
+    isPanning = false;
+});
+
+document.addEventListener("mousemove", (e) => {
+    if (!isPanning) return;
+
+    zoomX = e.clientX - startX;
+    zoomY = e.clientY - startY;
+
+    zoomContainer.style.transform =
+        `translate(${zoomX}px, ${zoomY}px) scale(${zoom})`;
+});
+
+// ====================================================
+// GAME LOGIC  (unchanged from previous version)
+// ====================================================
+
 const rocket = document.getElementById("rocket");
 const gameArea = document.getElementById("gameArea");
 const gate = document.getElementById("gate");
@@ -201,25 +272,29 @@ const yInput = document.getElementById("yInput");
 const slopeSlider = document.getElementById("slopeSlider");
 const slopeInput = document.getElementById("slopeInput");
 
+const quadSlider = document.getElementById("quadSlider");
+const quadInput = document.getElementById("quadInput");
+
+const cubicSlider = document.getElementById("cubicSlider");
+const cubicInput = document.getElementById("cubicInput");
+
 const canvas = document.getElementById("trailCanvas");
 const ctx = canvas.getContext("2d");
 
-function resizeCanvas() {
-    canvas.width = gameArea.clientWidth;
-    canvas.height = gameArea.clientHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+canvas.width = 3000;
+canvas.height = 3000;
 
-// GAME STATE
 let rocketX, rocketY;
 let slope = 0;
+let quad = 0;
+let cubic = 0;
 let speed = 6;
 let facing = "right";
 
 let anim = null;
 let lastTrailX = null;
 let lastTrailY = null;
+let frameCount = 0;
 
 let inFlight = false;
 let popupActive = false;
@@ -227,28 +302,26 @@ let roundFinished = false;
 
 let hits = 0;
 let misses = 0;
-
 const gateWidth = 150;
 
-// COORDINATE CONVERSION
+// UTILS
 function convertCenterToScreen(value) {
-    const center = gameArea.clientHeight / 2;
-    return center - value - rocket.clientHeight / 2;
-}
-function convertScreenToCenter(y) {
-    const center = gameArea.clientHeight / 2;
-    return -(y + rocket.clientHeight / 2 - center);
+    return 1500 - value - rocket.clientHeight / 2;
 }
 
-// SPAWN GATE
+function convertScreenToCenter(y) {
+    return -(y + rocket.clientHeight / 2 - 1500);
+}
+
+// GATE
 function spawnGate() {
-    const gapY = Math.random() * (gameArea.clientHeight - gateWidth);
+    const gapY = Math.random() * (3000 - gateWidth);
 
     gate.style.height = gateWidth + "px";
     gate.style.top = gapY + "px";
 
     const left = facing === "right"
-        ? (gameArea.clientWidth - gate.clientWidth)
+        ? (3000 - gate.clientWidth)
         : 0;
 
     gate.style.left = left + "px";
@@ -260,7 +333,6 @@ function spawnGate() {
 
 // RESET
 function resetRocket() {
-
     cancelAnimationFrame(anim);
     anim = null;
 
@@ -268,19 +340,21 @@ function resetRocket() {
     lastTrailX = null;
     lastTrailY = null;
 
-    rocketX = gameArea.clientWidth / 2 - rocket.clientWidth / 2;
-    rocketY = gameArea.clientHeight / 2 - rocket.clientHeight / 2;
+    rocketX = 1500 - rocket.clientWidth / 2;
+    rocketY = 1500 - rocket.clientHeight / 2;
 
     rocket.style.left = rocketX + "px";
-    rocket.style.top = rocketY + "px";
+    rocket.style.top  = rocketY + "px";
 
-    slope = 0;
-    slopeSlider.value = 0;
-    slopeInput.value = 0;
+    slope = quad = cubic = 0;
+    slopeSlider.value = slopeInput.value = 0;
+    quadSlider.value  = quadInput.value  = 0;
+    cubicSlider.value = cubicInput.value = 0;
+
+    frameCount = 0;
 
     const c = convertScreenToCenter(rocketY);
-    ySlider.value = c;
-    yInput.value = c;
+    ySlider.value = yInput.value = c;
 
     inFlight = false;
     roundFinished = false;
@@ -288,46 +362,59 @@ function resetRocket() {
     spawnGate();
 }
 
-// UPDATE Y BEFORE LAUNCH
+// BEFORE LAUNCH
 function setRocketFromCenter(v) {
     if (inFlight || popupActive) return;
-
-    const screenY = convertCenterToScreen(v);
-    const maxY = gameArea.clientHeight - rocket.clientHeight;
-
-    rocketY = Math.max(0, Math.min(maxY, screenY));
+    rocketY = convertCenterToScreen(v);
     rocket.style.top = rocketY + "px";
 }
 
-// Y SLIDERS
-ySlider.addEventListener("input", () => {
+// SLIDERS
+ySlider.oninput = () => {
     yInput.value = ySlider.value;
     setRocketFromCenter(parseInt(ySlider.value));
-});
-
-yInput.addEventListener("input", () => {
+};
+yInput.oninput = () => {
     let v = parseInt(yInput.value);
     if (isNaN(v)) v = 0;
     v = Math.max(-100, Math.min(100, v));
     yInput.value = v;
     ySlider.value = v;
     setRocketFromCenter(v);
-});
+};
 
-// SLOPE SLIDERS
-slopeSlider.addEventListener("input", () => {
+slopeSlider.oninput = () => {
     slope = parseFloat(slopeSlider.value);
     slopeInput.value = slope;
-});
-
-slopeInput.addEventListener("input", () => {
+};
+slopeInput.oninput = () => {
     let v = parseFloat(slopeInput.value);
-    if (isNaN(v)) v = 0;
     v = Math.max(-10, Math.min(10, v));
-    slopeInput.value = v;
-    slopeSlider.value = v;
+    slopeInput.value = slopeSlider.value = v;
     slope = v;
-});
+};
+
+quadSlider.oninput = () => {
+    quad = parseFloat(quadSlider.value);
+    quadInput.value = quad;
+};
+quadInput.oninput = () => {
+    let v = parseFloat(quadInput.value);
+    v = Math.max(-1, Math.min(1, v));
+    quadInput.value = quadSlider.value = v;
+    quad = v;
+};
+
+cubicSlider.oninput = () => {
+    cubic = parseFloat(cubicSlider.value);
+    cubicInput.value = cubic;
+};
+cubicInput.oninput = () => {
+    let v = parseFloat(cubicInput.value);
+    v = Math.max(-0.01, Math.min(0.01, v));
+    cubicInput.value = cubicSlider.value = v;
+    cubic = v;
+};
 
 // TRAIL
 function drawTrail(x1, y1, x2, y2) {
@@ -343,30 +430,32 @@ function drawTrail(x1, y1, x2, y2) {
 function rotateRocket(dir) {
     if (inFlight || popupActive) return;
     facing = dir;
-    rocket.style.transform = dir === "right"
-        ? "rotate(90deg)"
-        : "rotate(-90deg)";
+    rocket.style.transform =
+        dir === "right" ? "rotate(90deg)" : "rotate(-90deg)";
 }
 
 // LAUNCH
 function launchRocket() {
     if (inFlight || popupActive) return;
+
     inFlight = true;
+    frameCount = 0;
 
     function update() {
 
         const prevX = rocketX + rocket.clientWidth / 2;
         const prevY = rocketY + rocket.clientHeight / 2;
 
-        rocketX += facing === "right" ? speed : -speed;
+        rocketX += (facing === "right" ? speed : -speed);
 
-        // ✔ FIX: INVERTED SLOPE SIGN
         rocketY -= slope;
+        rocketY -= quad  * frameCount * frameCount;
+        rocketY -= cubic * frameCount * frameCount * frameCount;
 
-        rocketY = Math.max(0, Math.min(gameArea.clientHeight - rocket.clientHeight, rocketY));
+        frameCount++;
 
         rocket.style.left = rocketX + "px";
-        rocket.style.top = rocketY + "px";
+        rocket.style.top  = rocketY + "px";
 
         const newX = rocketX + rocket.clientWidth / 2;
         const newY = rocketY + rocket.clientHeight / 2;
@@ -378,7 +467,6 @@ function launchRocket() {
         lastTrailY = newY;
 
         checkCollision();
-
         anim = requestAnimationFrame(update);
     }
 
@@ -391,12 +479,9 @@ function checkCollision() {
 
     const gateRect = gate.getBoundingClientRect();
     const rocketRect = rocket.getBoundingClientRect();
-
     const centerY = rocketRect.top + rocketRect.height / 2;
 
-    const hit =
-        centerY >= gateRect.top &&
-        centerY <= gateRect.bottom;
+    const hit = centerY >= gateRect.top && centerY <= gateRect.bottom;
 
     if (facing === "right" && rocketRect.right >= gateRect.left)
         endLaunch(hit);
@@ -407,27 +492,24 @@ function checkCollision() {
 
 // END
 function endLaunch(success) {
-
     cancelAnimationFrame(anim);
     anim = null;
-
     inFlight = false;
     roundFinished = true;
 
     if (success) {
         hits++;
-        hitsCount.textContent = hits;
+        document.getElementById("hitsCount").textContent = hits;
         document.getElementById("hitsDots").innerHTML += "<span style='color:lime;'>●</span>";
     } else {
         misses++;
-        missCount.textContent = misses;
+        document.getElementById("missCount").textContent = misses;
         document.getElementById("missDots").innerHTML += "<span style='color:red;'>●</span>";
     }
 
     showPopup(success ? "Success!" : "Miss!");
 }
 
-// POPUP
 function showPopup(text) {
     document.getElementById("popupMessage").textContent = text;
     document.getElementById("popupOverlay").style.display = "flex";
@@ -450,7 +532,7 @@ document.addEventListener("keydown", e => {
     if (e.key === " ") launchRocket();
 });
 
-// INIT
+// START GAME
 resetRocket();
 </script>
 

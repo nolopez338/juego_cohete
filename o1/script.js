@@ -1533,6 +1533,18 @@ function checkCollision(prevX, newX, centerY) {
 
 // KEYS
 document.addEventListener("keydown", e => {
+    if (e.key === "Backspace") {
+        e.preventDefault();
+        resetGame();
+        return;
+    }
+
+    if (e.key === "Delete") {
+        e.preventDefault();
+        nextIteration();
+        return;
+    }
+
     if (frozen) return;
 
     if (e.key === "ArrowLeft") rotateRocket("left");

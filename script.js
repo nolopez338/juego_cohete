@@ -15,7 +15,7 @@ let sliderActive = false;
 
 function applyTransform() {
     zoomContainer.style.transform =
-        `scale(${zoom}) translate(${translateX}px, ${translateY}px)`;
+        `translate(${translateX}px, ${translateY}px) scale(${zoom})`;
 }
 
 function centerGraphOnRocket() {

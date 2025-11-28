@@ -9,6 +9,8 @@ const gateList = document.getElementById("gateList");
 const savedLevelsPanel = document.getElementById("savedLevelsPanel");
 const savedLevelsList = document.getElementById("savedLevelsList");
 const generalConfigPanel = document.getElementById("generalConfigPanel");
+const superMenu = document.getElementById("superMenu");
+const superMenuToggle = document.getElementById("superMenuToggle");
 const DESIRED_VIEW_RANGE = 60; // Shows -30 to 30 on both axes
 const MAX_ZOOM = 30;
 let zoom = 1;
@@ -560,6 +562,19 @@ function refreshPanelBodyHeight(panel) {
     const body = panel.querySelector(".panelBody");
     if (!body || panel.classList.contains("collapsed")) return;
     body.style.maxHeight = `${body.scrollHeight}px`;
+}
+
+function setSuperMenuCollapsed(collapsed) {
+    if (!superMenu || !superMenuToggle) return;
+
+    superMenu.classList.toggle("collapsed", collapsed);
+    superMenuToggle.textContent = collapsed ? "›" : "‹";
+    superMenuToggle.setAttribute("aria-expanded", (!collapsed).toString());
+
+    if (!collapsed) {
+        [topControlsPanel, topControlsPanelB, generalConfigPanel, gateControlsPanel, savedLevelsPanel]
+            .forEach(refreshPanelBodyHeight);
+    }
 }
 
 // UTILS
@@ -1354,6 +1369,15 @@ initializeCollapsible(topControlsPanelB);
 initializeCollapsible(generalConfigPanel);
 initializeCollapsible(gateControlsPanel);
 initializeCollapsible(savedLevelsPanel);
+
+if (superMenuToggle && superMenu) {
+    superMenuToggle.addEventListener("click", () => {
+        const shouldCollapse = !superMenu.classList.contains("collapsed");
+        setSuperMenuCollapsed(shouldCollapse);
+    });
+
+    setSuperMenuCollapsed(false);
+}
 
 window.addEventListener("resize", () => {
     [topControlsPanel, topControlsPanelB, generalConfigPanel, gateControlsPanel, savedLevelsPanel].forEach(panel => {

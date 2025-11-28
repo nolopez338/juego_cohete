@@ -161,6 +161,14 @@ body {
     position: absolute;
 }
 
+.scoreRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
 #gateInfo {
     top: 10px;
     left: 10px;

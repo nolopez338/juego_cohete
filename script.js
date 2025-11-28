@@ -260,6 +260,7 @@ class ScoreBoard {
         this.misses = 0;
         this.runTotal = 0;
         this.runRemaining = 0;
+        this.runStartHits = 0;
         this.runStartMisses = 0;
 
         this.updateCounts();
@@ -269,6 +270,7 @@ class ScoreBoard {
     resetRun() {
         this.runTotal = 0;
         this.runRemaining = 0;
+        this.runStartHits = this.hits;
         this.runStartMisses = this.misses;
         this.updateRunTotals();
     }
@@ -276,6 +278,7 @@ class ScoreBoard {
     startRun(totalGates) {
         this.runTotal = totalGates;
         this.runRemaining = totalGates;
+        this.runStartHits = this.hits;
         this.runStartMisses = this.misses;
         this.updateRunTotals();
     }
@@ -333,11 +336,33 @@ class ScoreBoard {
         container.appendChild(fragment);
     }
 
+    removeDots(container, count) {
+        for (let i = 0; i < count; i++) {
+            const lastDot = container.lastElementChild;
+            if (!lastDot) break;
+            container.removeChild(lastDot);
+        }
+    }
+
+    clearLastRunResults() {
+        const hitsToRemove = Math.max(0, this.hits - this.runStartHits);
+        const missesToRemove = Math.max(0, this.misses - this.runStartMisses);
+
+        this.removeDots(this.hitDotsEl, hitsToRemove);
+        this.removeDots(this.missDotsEl, missesToRemove);
+
+        this.hits = this.runStartHits;
+        this.misses = this.runStartMisses;
+        this.updateCounts();
+        this.resetRun();
+    }
+
     resetAll() {
         this.hits = 0;
         this.misses = 0;
         this.runTotal = 0;
         this.runRemaining = 0;
+        this.runStartHits = 0;
         this.runStartMisses = 0;
 
         this.hitDotsEl.innerHTML = "";
@@ -779,7 +804,7 @@ function resetRocket() {
 }
 
 function resetGame() {
-    scoreBoard.resetAll();
+    scoreBoard.clearLastRunResults();
     resetRocket();
 }
 

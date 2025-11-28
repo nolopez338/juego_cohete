@@ -6,6 +6,8 @@ const DEFAULT_ROCKET_SIZE = 1;
 const zoomContainer = document.getElementById("zoomContainer");
 const gateControlsPanel = document.getElementById("gateControls");
 const gateList = document.getElementById("gateList");
+const savedLevelsPanel = document.getElementById("savedLevelsPanel");
+const savedLevelsList = document.getElementById("savedLevelsList");
 const DESIRED_VIEW_RANGE = 60; // Shows -30 to 30 on both axes
 const MAX_ZOOM = 30;
 let zoom = 1;
@@ -141,6 +143,55 @@ const gateY1Input = document.getElementById("gateY1Input");
 const gateY2Input = document.getElementById("gateY2Input");
 const addGateBtn = document.getElementById("addGateBtn");
 const gridSvg = document.getElementById("gridSvg");
+
+const savedLevels = [
+    {
+        name: "Level 1",
+        gates: [
+            { x: 10, y1: 20, y2: 50 }
+        ]
+    },
+    {
+        name: "Level 2",
+        gates: [
+            { x: 5, y1: -10, y2: 0 },
+            { x: 10, y1: 5, y2: 10 }
+        ]
+    },
+    {
+        name: "Level 3",
+        gates: [
+            { x: 8, y1: -30, y2: 5 },
+            { x: 16, y1: 15, y2: 45 }
+        ]
+    },
+    {
+        name: "Level 4",
+        gates: [
+            { x: 6, y1: -25, y2: 15 },
+            { x: 12, y1: -5, y2: 25 },
+            { x: 18, y1: 30, y2: 70 }
+        ]
+    },
+    {
+        name: "Level 5",
+        gates: [
+            { x: 4, y1: -40, y2: -5 },
+            { x: 10, y1: 0, y2: 35 },
+            { x: 16, y1: 25, y2: 60 },
+            { x: 22, y1: 55, y2: 95 }
+        ]
+    },
+    {
+        name: "Level 6",
+        gates: [
+            { x: 5, y1: -60, y2: -20 },
+            { x: 12, y1: -15, y2: 20 },
+            { x: 18, y1: 10, y2: 45 },
+            { x: 26, y1: 40, y2: 80 }
+        ]
+    }
+];
 
 const canvas = document.getElementById("trailCanvas");
 const ctx = canvas.getContext("2d");
@@ -615,6 +666,18 @@ function addGate(x, y1, y2) {
     renderGateList();
 }
 
+function loadSavedLevel(levelIndex) {
+    const level = savedLevels[levelIndex];
+    if (!level) return;
+
+    clearGates();
+    level.gates.forEach(gate => addGate(gate.x, gate.y1, gate.y2));
+
+    facing = "right";
+    rocketAngle = 90;
+    resetRocket();
+}
+
 function getNextGate() {
     if (!gates.length || rocketX === undefined) return null;
 
@@ -716,6 +779,9 @@ function resetRocket() {
     cancelAnimationFrame(anim);
     anim = null;
 
+    facing = "right";
+    rocketAngle = 90;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     lastTrailX = null;
     lastTrailY = null;
@@ -746,6 +812,7 @@ function resetRocket() {
 
     setDefaultView();
     centerGraphOnRocket();
+    updateRocketTransform();
     updateGateInfo();
 }
 
@@ -840,15 +907,32 @@ registerSlider(quadSlider);
 registerSlider(cubicSlider);
 registerSlider(rocketSizeSlider);
 
+function renderSavedLevelButtons() {
+    if (!savedLevelsList) return;
+
+    savedLevelsList.innerHTML = "";
+    savedLevels.forEach((level, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = level.name;
+        btn.className = "secondaryBtn";
+        btn.addEventListener("click", () => loadSavedLevel(index));
+        savedLevelsList.appendChild(btn);
+    });
+
+    refreshPanelBodyHeight(savedLevelsPanel);
+}
+
 makePanelDraggable(topControlsPanel);
 makePanelDraggable(gateControlsPanel);
 makePanelDraggable(gateInfoPanel);
+makePanelDraggable(savedLevelsPanel);
 initializeCollapsible(topControlsPanel);
 initializeCollapsible(gateControlsPanel);
 initializeCollapsible(gateInfoPanel);
+initializeCollapsible(savedLevelsPanel);
 
 window.addEventListener("resize", () => {
-    [topControlsPanel, gateControlsPanel, gateInfoPanel].forEach(panel => {
+    [topControlsPanel, gateControlsPanel, gateInfoPanel, savedLevelsPanel].forEach(panel => {
         if (!panel || panel.classList.contains("collapsed")) return;
         const body = panel.querySelector(".panelBody");
         if (!body) return;
@@ -1222,6 +1306,7 @@ document.addEventListener("keydown", e => {
     if (e.key === " ") launchRocket();
 });
 
+renderSavedLevelButtons();
 renderGateList();
 // START GAME
 resetRocket();

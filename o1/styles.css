@@ -75,9 +75,10 @@ body {
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(4px);
     box-sizing: border-box;
-    width: min(max-content, 95vw);
+    width: min(760px, 96vw);
     max-height: calc(100vh - 20px);
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     z-index: 20;
     transition: width 0.25s ease, padding 0.25s ease;
 }

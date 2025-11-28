@@ -95,8 +95,14 @@ const quadInput = document.getElementById("quadInput");
 const cubicSlider = document.getElementById("cubicSlider");
 const cubicInput = document.getElementById("cubicInput");
 
+const gridCanvas = document.getElementById("gridCanvas");
+const gridCtx = gridCanvas.getContext("2d");
+
 const canvas = document.getElementById("trailCanvas");
 const ctx = canvas.getContext("2d");
+
+gridCanvas.width = 3000;
+gridCanvas.height = 3000;
 
 canvas.width = 3000;
 canvas.height = 3000;
@@ -248,6 +254,113 @@ registerSlider(ySlider);
 registerSlider(slopeSlider);
 registerSlider(quadSlider);
 registerSlider(cubicSlider);
+
+// GRID
+function drawGrid() {
+    const gridSpacing = 100;
+    const tickLength = 12;
+    const labelSpacing = 500;
+    const centerX = gridCanvas.width / 2;
+    const centerY = gridCanvas.height / 2;
+
+    gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+
+    gridCtx.strokeStyle = "#2d2d2d";
+    gridCtx.lineWidth = 1;
+
+    for (let x = 0; x <= gridCanvas.width; x += gridSpacing) {
+        gridCtx.beginPath();
+        gridCtx.moveTo(x, 0);
+        gridCtx.lineTo(x, gridCanvas.height);
+        gridCtx.stroke();
+    }
+
+    for (let y = 0; y <= gridCanvas.height; y += gridSpacing) {
+        gridCtx.beginPath();
+        gridCtx.moveTo(0, y);
+        gridCtx.lineTo(gridCanvas.width, y);
+        gridCtx.stroke();
+    }
+
+    gridCtx.strokeStyle = "#555";
+    gridCtx.lineWidth = 2;
+
+    gridCtx.beginPath();
+    gridCtx.moveTo(centerX, 0);
+    gridCtx.lineTo(centerX, gridCanvas.height);
+    gridCtx.stroke();
+
+    gridCtx.beginPath();
+    gridCtx.moveTo(0, centerY);
+    gridCtx.lineTo(gridCanvas.width, centerY);
+    gridCtx.stroke();
+
+    gridCtx.strokeStyle = "#777";
+    gridCtx.fillStyle = "#888";
+    gridCtx.font = "12px Arial";
+
+    function drawVerticalTick(x) {
+        gridCtx.beginPath();
+        gridCtx.moveTo(x, centerY - tickLength / 2);
+        gridCtx.lineTo(x, centerY + tickLength / 2);
+        gridCtx.stroke();
+    }
+
+    function drawHorizontalTick(y) {
+        gridCtx.beginPath();
+        gridCtx.moveTo(centerX - tickLength / 2, y);
+        gridCtx.lineTo(centerX + tickLength / 2, y);
+        gridCtx.stroke();
+    }
+
+    for (let offset = 0; offset <= gridCanvas.width / 2; offset += gridSpacing) {
+        const xPos = centerX + offset;
+        const xNeg = centerX - offset;
+
+        if (xPos <= gridCanvas.width) {
+            drawVerticalTick(xPos);
+            if (offset % labelSpacing === 0) {
+                gridCtx.textAlign = "center";
+                gridCtx.textBaseline = "top";
+                gridCtx.fillText(offset, xPos, centerY + tickLength / 2 + 4);
+            }
+        }
+
+        if (offset !== 0 && xNeg >= 0) {
+            drawVerticalTick(xNeg);
+            if (offset % labelSpacing === 0) {
+                gridCtx.textAlign = "center";
+                gridCtx.textBaseline = "top";
+                gridCtx.fillText(-offset, xNeg, centerY + tickLength / 2 + 4);
+            }
+        }
+    }
+
+    for (let offset = 0; offset <= gridCanvas.height / 2; offset += gridSpacing) {
+        const yPos = centerY + offset;
+        const yNeg = centerY - offset;
+
+        if (yPos <= gridCanvas.height) {
+            drawHorizontalTick(yPos);
+            if (offset % labelSpacing === 0 && offset !== 0) {
+                gridCtx.textAlign = "right";
+                gridCtx.textBaseline = "middle";
+                gridCtx.fillText(-offset, centerX - tickLength / 2 - 6, yPos);
+            }
+        }
+
+        if (yNeg >= 0) {
+            drawHorizontalTick(yNeg);
+            if (offset % labelSpacing === 0 && offset !== 0) {
+                gridCtx.textAlign = "right";
+                gridCtx.textBaseline = "middle";
+                gridCtx.fillText(offset, centerX - tickLength / 2 - 6, yNeg);
+            }
+        }
+    }
+}
+
+drawGrid();
 
 // TRAIL
 function drawTrail(x1, y1, x2, y2) {

@@ -33,6 +33,16 @@ body {
     z-index: 1;
 }
 
+#gridCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3000px;
+    height: 3000px;
+    pointer-events: none;
+    z-index: 0;
+}
+
 .rocket {
     position: absolute;
     width: 40px;

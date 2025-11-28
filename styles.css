@@ -1,0 +1,133 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #111;
+    color: white;
+    font-family: Arial;
+}
+
+/* MAP ONLY — gets zoomed + translated */
+#zoomContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+}
+
+/* Large map so off-screen trajectory becomes visible when zooming out */
+#gameArea {
+    position: relative;
+    width: 3000px;
+    height: 3000px;
+    background: #222;
+    overflow: visible;
+}
+
+#trailCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3000px;
+    height: 3000px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.rocket {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: red;
+    border-radius: 50% 50% 0 0;
+    transition: transform 0.1s;
+    z-index: 3;
+}
+
+.gate {
+    position: absolute;
+    width: 20px;
+    background: lime;
+    z-index: 2;
+}
+
+/* UI stays normal size (NOT affected by zoom) */
+#topControls {
+    position: absolute;
+    top: 10px;
+    left: 25%;
+    transform: translateX(-25%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.controlRow {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.controlRow input[type="range"] {
+    width: 180px;
+}
+
+.numInput {
+    width: 60px;
+    text-align: center;
+    font-size: 16px;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 3px;
+}
+
+#gateInfo,
+#scoreDisplay,
+#popupOverlay {
+    z-index: 30;
+    position: absolute;
+}
+
+#gateInfo {
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 15px;
+    border-radius: 10px;
+}
+
+#scoreDisplay {
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 18px;
+    border-radius: 10px;
+    min-width: 220px;
+}
+
+#popupOverlay {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+#popupBox {
+    background: #333;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 20px;
+    width: 250px;
+}

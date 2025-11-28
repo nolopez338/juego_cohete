@@ -96,8 +96,7 @@ rocket.style.width = `${scaledRocketWidth}px`;
 rocket.style.height = `${scaledRocketHeight}px`;
 const gameArea = document.getElementById("gameArea");
 
-const gateCanvas = document.getElementById("gateCanvas");
-const gateCtx = gateCanvas.getContext("2d");
+const gateSvg = document.getElementById("gateSvg");
 
 const gateXLabel = document.getElementById("gateXLabel");
 const gateTopLabel = document.getElementById("gateTopLabel");
@@ -150,8 +149,9 @@ gridSvg.setAttribute("width", MAP_SIZE);
 gridSvg.setAttribute("height", MAP_SIZE);
 gridSvg.setAttribute("viewBox", `0 0 ${MAP_SIZE} ${MAP_SIZE}`);
 
-gateCanvas.width = MAP_SIZE;
-gateCanvas.height = MAP_SIZE;
+gateSvg.setAttribute("width", MAP_SIZE);
+gateSvg.setAttribute("height", MAP_SIZE);
+gateSvg.setAttribute("viewBox", `0 0 ${MAP_SIZE} ${MAP_SIZE}`);
 
 canvas.width = MAP_SIZE;
 canvas.height = MAP_SIZE;
@@ -191,6 +191,7 @@ const GRID_ZOOM_STEPS = [
 
 let currentGridConfig = null;
 let currentLabelFontSize = null;
+let currentGateLabelFontSize = null;
 
 class ScoreBoard {
     constructor(hitsEl, missesEl, totalEl, hitDotsEl, missDotsEl) {
@@ -399,13 +400,23 @@ function toScreenY(value) {
 
 // GATES
 function drawGates() {
-    gateCtx.clearRect(0, 0, MAP_SIZE, MAP_SIZE);
-    gateCtx.strokeStyle = "lime";
-    gateCtx.lineWidth = 3;
-    gateCtx.fillStyle = "white";
-    gateCtx.font = "14px Arial";
-    gateCtx.textAlign = "left";
-    gateCtx.textBaseline = "middle";
+    while (gateSvg.firstChild) gateSvg.removeChild(gateSvg.firstChild);
+
+    const lineGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    lineGroup.setAttribute("stroke", "lime");
+    lineGroup.setAttribute("stroke-width", "3");
+    lineGroup.setAttribute("shape-rendering", "geometricPrecision");
+
+    const labelFontSize = getLabelFontSizeForZoom(zoom);
+    currentGateLabelFontSize = labelFontSize;
+
+    const labelGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    labelGroup.dataset.role = "gate-labels";
+    labelGroup.setAttribute("fill", "white");
+    labelGroup.setAttribute("font-size", labelFontSize);
+    labelGroup.setAttribute("font-family", "Arial, sans-serif");
+    labelGroup.setAttribute("text-anchor", "start");
+    labelGroup.setAttribute("dominant-baseline", "middle");
 
     gates.forEach(gate => {
         const x = toScreenX(gate.x);
@@ -414,20 +425,34 @@ function drawGates() {
         const gapTop = Math.min(y1, y2);
         const gapBottom = Math.max(y1, y2);
 
-        gateCtx.beginPath();
-        gateCtx.moveTo(x, gapTop);
-        gateCtx.lineTo(x, gapBottom);
-        gateCtx.stroke();
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x);
+        line.setAttribute("y1", gapTop);
+        line.setAttribute("x2", x);
+        line.setAttribute("y2", gapBottom);
+        lineGroup.appendChild(line);
 
         if (gate.showCoordinates) {
             const labelOffset = 8;
-            const topLabel = `( ${gate.x}, ${gate.y1} )`;
-            const bottomLabel = `( ${gate.x}, ${gate.y2} )`;
+            const topLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            topLabel.dataset.role = "gate-label";
+            topLabel.setAttribute("x", x + labelOffset);
+            topLabel.setAttribute("y", y1);
+            topLabel.textContent = `( ${gate.x}, ${gate.y1} )`;
 
-            gateCtx.fillText(topLabel, x + labelOffset, y1);
-            gateCtx.fillText(bottomLabel, x + labelOffset, y2);
+            const bottomLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            bottomLabel.dataset.role = "gate-label";
+            bottomLabel.setAttribute("x", x + labelOffset);
+            bottomLabel.setAttribute("y", y2);
+            bottomLabel.textContent = `( ${gate.x}, ${gate.y2} )`;
+
+            labelGroup.appendChild(topLabel);
+            labelGroup.appendChild(bottomLabel);
         }
     });
+
+    gateSvg.appendChild(lineGroup);
+    gateSvg.appendChild(labelGroup);
 }
 
 function renderGateList() {
@@ -839,6 +864,22 @@ function updateGridForZoom() {
         }
         currentLabelFontSize = labelFontSize;
     }
+
+    updateGateLabelsForZoom();
+}
+
+function updateGateLabelsForZoom() {
+    const labelGroup = gateSvg.querySelector('[data-role="gate-labels"]');
+    if (!labelGroup) return;
+
+    const labelFontSize = getLabelFontSizeForZoom(zoom);
+    if (currentGateLabelFontSize !== null &&
+        Math.abs(labelFontSize - currentGateLabelFontSize) <= 0.01) {
+        return;
+    }
+
+    labelGroup.setAttribute("font-size", labelFontSize);
+    currentGateLabelFontSize = labelFontSize;
 }
 
 function drawGrid(config, labelFontSize) {

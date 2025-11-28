@@ -8,9 +8,18 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 2rem;
+      padding: 2.5rem 3rem;
       background: #f8fafc;
       color: #0f172a;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 1rem;
+      padding: 2rem 2.25rem;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
     }
 
     header {
@@ -19,12 +28,13 @@
 
     h1 {
       margin: 0 0 0.75rem;
-      font-size: 1.9rem;
+      font-size: 2rem;
+      line-height: 1.2;
     }
 
     ul {
       padding-left: 1.25rem;
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
     .links {
@@ -36,35 +46,62 @@
 
     a {
       display: inline-block;
-      padding: 0.6rem 1rem;
+      padding: 0.7rem 1.1rem;
       background: #2563eb;
       color: #ffffff;
       text-decoration: none;
-      border-radius: 0.5rem;
-      transition: background 0.2s ease;
+      border-radius: 0.75rem;
+      transition: background 0.2s ease, transform 0.2s ease;
     }
 
     a:hover {
       background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 1.5rem 1.25rem;
+      }
+
+      main {
+        padding: 1.5rem;
+        box-shadow: none;
+        border-radius: 0.75rem;
+      }
+
+      h1 {
+        font-size: 1.65rem;
+      }
+
+      .links {
+        flex-direction: column;
+      }
+
+      a {
+        text-align: center;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Comportamiento y comparación de funciones polinómicas</h1>
-    <p>Explora los objetivos del proyecto y accede a cada sección para estudiar el comportamiento y la comparación de modelos polinómicos.</p>
-  </header>
+  <main>
+    <header>
+      <h1>Comportamiento y comparación de funciones polinómicas</h1>
+      <p>Explora los objetivos del proyecto y accede a cada sección para estudiar el comportamiento y la comparación de modelos polinómicos.</p>
+    </header>
 
-  <section>
-    <ul>
-      <li><strong>Primer objetivo.</strong> Emplear técnicas para describir el comportamiento en los extremos del dominio de funciones polinómicas, con el fin de interpretar modelos matemáticos en diferentes contextos aplicados.</li>
-      <li><strong>Segundo objetivo.</strong> Analizar y contrastar modelos de funciones polinómicas que describen fenómenos del mundo real, para tomar decisiones fundamentadas a partir de las diferencias y similitudes identificadas.</li>
-    </ul>
-  </section>
+    <section>
+      <ul>
+        <li><strong>Primer objetivo.</strong> Emplear técnicas para describir el comportamiento en los extremos del dominio de funciones polinómicas, con el fin de interpretar modelos matemáticos en diferentes contextos aplicados.</li>
+        <li><strong>Segundo objetivo.</strong> Analizar y contrastar modelos de funciones polinómicas que describen fenómenos del mundo real, para tomar decisiones fundamentadas a partir de las diferencias y similitudes identificadas.</li>
+      </ul>
+    </section>
 
-  <div class="links">
-    <a href="/o1/index.html">Ver primer objetivo</a>
-    <a href="/o2/index.html">Ver segundo objetivo</a>
-  </div>
+    <div class="links">
+      <a href="/o1/index.html">Ver primer objetivo</a>
+      <a href="/o2/index.html">Ver segundo objetivo</a>
+    </div>
+  </main>
 </body>
 </html>

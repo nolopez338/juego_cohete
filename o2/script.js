@@ -206,6 +206,27 @@ function clampNumber(value, min, max) {
     return Math.min(Math.max(value, min), max);
 }
 
+function getParsedInputValue(inputEl) {
+    if (!inputEl) return null;
+    const rawValue = inputEl.value;
+    if (rawValue === "" || rawValue === null || rawValue === undefined) {
+        return null;
+    }
+
+    const parsed = parseFloat(rawValue);
+    return Number.isFinite(parsed) ? parsed : null;
+}
+
+function onNumberInput(inputEl, handler) {
+    if (!inputEl || typeof handler !== "function") return;
+
+    inputEl.addEventListener("input", () => {
+        const parsed = getParsedInputValue(inputEl);
+        if (parsed === null) return;
+        handler(parsed);
+    });
+}
+
 const gateXInput = document.getElementById("gateXInput");
 const gateY1Input = document.getElementById("gateY1Input");
 const gateY2Input = document.getElementById("gateY2Input");
@@ -1215,12 +1236,10 @@ function setupRangeLimits({ slider, minInput, maxInput, valueInput, onValueUpdat
     };
 
     const commitRangeChanges = () => {
-        const minVal = parseFloat(minInput.value);
-        const maxVal = parseFloat(maxInput.value);
+        const minVal = getParsedInputValue(minInput);
+        const maxVal = getParsedInputValue(maxInput);
 
-        if (!Number.isFinite(minVal) || !Number.isFinite(maxVal)) {
-            minInput.value = lastValidMin;
-            maxInput.value = lastValidMax;
+        if (minVal === null || maxVal === null) {
             return;
         }
 
@@ -1233,6 +1252,8 @@ function setupRangeLimits({ slider, minInput, maxInput, valueInput, onValueUpdat
         }
     };
 
+    onNumberInput(minInput, commitRangeChanges);
+    onNumberInput(maxInput, commitRangeChanges);
     minInput.addEventListener("keydown", handleKeyDown);
     maxInput.addEventListener("keydown", handleKeyDown);
 
@@ -1267,6 +1288,8 @@ function setRocketFromCenterB(v) {
 
 // SLIDERS
 function handleYChange(value) {
+    if (!Number.isFinite(value)) return;
+
     const min = parseFloat(ySlider.min);
     const max = parseFloat(ySlider.max);
     const clamped = clampNumber(value, min, max);
@@ -1276,6 +1299,8 @@ function handleYChange(value) {
 }
 
 function handleYChangeB(value) {
+    if (!Number.isFinite(value)) return;
+
     const min = parseFloat(ySliderB.min);
     const max = parseFloat(ySliderB.max);
     const clamped = clampNumber(value, min, max);
@@ -1285,6 +1310,8 @@ function handleYChangeB(value) {
 }
 
 function handleSlopeChange(value) {
+    if (!Number.isFinite(value)) return;
+
     const min = parseFloat(slopeSlider.min);
     const max = parseFloat(slopeSlider.max);
     const clamped = clampNumber(value, min, max);
@@ -1294,6 +1321,8 @@ function handleSlopeChange(value) {
 }
 
 function handleSlopeChangeB(value) {
+    if (!Number.isFinite(value)) return;
+
     const min = parseFloat(slopeSliderB.min);
     const max = parseFloat(slopeSliderB.max);
     const clamped = clampNumber(value, min, max);
@@ -1303,6 +1332,8 @@ function handleSlopeChangeB(value) {
 }
 
 function handleQuadChange(value) {
+    if (!Number.isFinite(value)) return;
+
     const min = parseFloat(quadSlider.min);
     const max = parseFloat(quadSlider.max);
     const clamped = clampNumber(value, min, max);
@@ -1312,6 +1343,8 @@ function handleQuadChange(value) {
 }
 
 function handleQuadChangeB(value) {
+    if (!Number.isFinite(value)) return;
+
     const min = parseFloat(quadSliderB.min);
     const max = parseFloat(quadSliderB.max);
     const clamped = clampNumber(value, min, max);
@@ -1321,6 +1354,8 @@ function handleQuadChangeB(value) {
 }
 
 function handleCubicChange(value) {
+    if (!Number.isFinite(value)) return;
+
     const min = parseFloat(cubicSlider.min);
     const max = parseFloat(cubicSlider.max);
     const clamped = clampNumber(value, min, max);
@@ -1330,6 +1365,8 @@ function handleCubicChange(value) {
 }
 
 function handleCubicChangeB(value) {
+    if (!Number.isFinite(value)) return;
+
     const min = parseFloat(cubicSliderB.min);
     const max = parseFloat(cubicSliderB.max);
     const clamped = clampNumber(value, min, max);
@@ -1339,28 +1376,28 @@ function handleCubicChangeB(value) {
 }
 
 ySlider.oninput = () => handleYChange(parseFloat(ySlider.value));
-yInput.oninput = () => handleYChange(parseFloat(yInput.value));
+onNumberInput(yInput, handleYChange);
 
 ySliderB.oninput = () => handleYChangeB(parseFloat(ySliderB.value));
-yInputB.oninput = () => handleYChangeB(parseFloat(yInputB.value));
+onNumberInput(yInputB, handleYChangeB);
 
 slopeSlider.oninput = () => handleSlopeChange(parseFloat(slopeSlider.value));
-slopeInput.oninput = () => handleSlopeChange(parseFloat(slopeInput.value));
+onNumberInput(slopeInput, handleSlopeChange);
 
 slopeSliderB.oninput = () => handleSlopeChangeB(parseFloat(slopeSliderB.value));
-slopeInputB.oninput = () => handleSlopeChangeB(parseFloat(slopeInputB.value));
+onNumberInput(slopeInputB, handleSlopeChangeB);
 
 quadSlider.oninput = () => handleQuadChange(parseFloat(quadSlider.value));
-quadInput.oninput = () => handleQuadChange(parseFloat(quadInput.value));
+onNumberInput(quadInput, handleQuadChange);
 
 quadSliderB.oninput = () => handleQuadChangeB(parseFloat(quadSliderB.value));
-quadInputB.oninput = () => handleQuadChangeB(parseFloat(quadInputB.value));
+onNumberInput(quadInputB, handleQuadChangeB);
 
 cubicSlider.oninput = () => handleCubicChange(parseFloat(cubicSlider.value));
-cubicInput.oninput = () => handleCubicChange(parseFloat(cubicInput.value));
+onNumberInput(cubicInput, handleCubicChange);
 
 cubicSliderB.oninput = () => handleCubicChangeB(parseFloat(cubicSliderB.value));
-cubicInputB.oninput = () => handleCubicChangeB(parseFloat(cubicInputB.value));
+onNumberInput(cubicInputB, handleCubicChangeB);
 
 setupRangeLimits({
     slider: ySlider,

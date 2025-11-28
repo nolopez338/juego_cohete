@@ -5,10 +5,21 @@ const zoomContainer = document.getElementById("zoomContainer");
 let zoom = 1;
 let translateX = 0;
 let translateY = 0;
+let sliderActive = false;
 
 function applyTransform() {
     zoomContainer.style.transform =
         `scale(${zoom}) translate(${translateX}px, ${translateY}px)`;
+}
+
+function centerGraphOnRocket() {
+    const rocketCenterX = rocketX + rocket.clientWidth / 2;
+    const rocketCenterY = rocketY + rocket.clientHeight / 2;
+
+    translateX = window.innerWidth / 2 - rocketCenterX * zoom;
+    translateY = window.innerHeight / 2 - rocketCenterY * zoom;
+
+    applyTransform();
 }
 
 // --- MOUSE ZOOM ---
@@ -39,6 +50,8 @@ let isPanning = false;
 let startX = 0, startY = 0;
 
 document.addEventListener("mousedown", (e) => {
+    if (sliderActive) return;
+
     isPanning = true;
     startX = e.clientX - translateX;
     startY = e.clientY - translateY;
@@ -46,6 +59,7 @@ document.addEventListener("mousedown", (e) => {
 
 document.addEventListener("mouseup", () => {
     isPanning = false;
+    sliderActive = false;
 });
 
 document.addEventListener("mousemove", (e) => {
@@ -162,6 +176,7 @@ function resetRocket() {
     inFlight = false;
     roundFinished = false;
 
+    centerGraphOnRocket();
     spawnGate();
 }
 
@@ -218,6 +233,21 @@ cubicInput.oninput = () => {
     cubicInput.value = cubicSlider.value = v;
     cubic = v;
 };
+
+function registerSlider(slider) {
+    ["mousedown", "touchstart"].forEach(evt => {
+        slider.addEventListener(evt, () => sliderActive = true);
+    });
+
+    ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach(evt => {
+        slider.addEventListener(evt, () => sliderActive = false);
+    });
+}
+
+registerSlider(ySlider);
+registerSlider(slopeSlider);
+registerSlider(quadSlider);
+registerSlider(cubicSlider);
 
 // TRAIL
 function drawTrail(x1, y1, x2, y2) {

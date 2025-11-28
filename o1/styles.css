@@ -74,7 +74,8 @@ body {
     border-radius: 12px;
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(4px);
-    width: min(520px, 95vw);
+    box-sizing: border-box;
+    width: min(max-content, 95vw);
     max-height: calc(100vh - 20px);
     overflow: auto;
     z-index: 20;
@@ -191,7 +192,7 @@ body {
     cursor: grabbing;
 }
 
-#gateControls button {
+#gateControls .panelBody button {
     padding: 6px 12px;
     border-radius: 8px;
     border: none;

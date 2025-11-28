@@ -1,3 +1,5 @@
+const ROCKET_SIZE_MULTIPLIER = 1;
+
 // ====================================================
 // ZOOM + PAN SYSTEM  (MAP ONLY)
 // ====================================================
@@ -85,6 +87,12 @@ document.addEventListener("mousemove", (e) => {
 // ====================================================
 
 const rocket = document.getElementById("rocket");
+const baseRocketWidth = rocket.clientWidth;
+const baseRocketHeight = rocket.clientHeight;
+const scaledRocketWidth = baseRocketWidth * ROCKET_SIZE_MULTIPLIER;
+const scaledRocketHeight = baseRocketHeight * ROCKET_SIZE_MULTIPLIER;
+rocket.style.width = `${scaledRocketWidth}px`;
+rocket.style.height = `${scaledRocketHeight}px`;
 const gameArea = document.getElementById("gameArea");
 
 const gateCanvas = document.getElementById("gateCanvas");

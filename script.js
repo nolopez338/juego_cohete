@@ -488,14 +488,17 @@ function setRocketSize(value, maintainCenter = true) {
     updateRocketSize(maintainCenter);
 }
 
+const GATE_BASE_STROKE_WIDTH = 3;
+
 // GATES
 function drawGates() {
     while (gateSvg.firstChild) gateSvg.removeChild(gateSvg.firstChild);
 
     const lineGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
     lineGroup.setAttribute("stroke", "lime");
-    lineGroup.setAttribute("stroke-width", "3");
+    lineGroup.setAttribute("stroke-width", getGateStrokeWidthForZoom(zoom));
     lineGroup.setAttribute("shape-rendering", "geometricPrecision");
+    lineGroup.dataset.role = "gate-lines";
 
     const labelFontSize = getLabelFontSizeForZoom(zoom);
     currentGateLabelFontSize = labelFontSize;
@@ -962,6 +965,7 @@ function updateGridForZoom() {
     }
 
     updateGateLabelsForZoom();
+    updateGateStrokesForZoom();
 }
 
 function updateGateLabelsForZoom() {
@@ -976,6 +980,18 @@ function updateGateLabelsForZoom() {
 
     labelGroup.setAttribute("font-size", labelFontSize);
     currentGateLabelFontSize = labelFontSize;
+}
+
+function updateGateStrokesForZoom() {
+    const lineGroup = gateSvg.querySelector('[data-role="gate-lines"]');
+    if (!lineGroup) return;
+
+    const strokeWidth = getGateStrokeWidthForZoom(zoom);
+    lineGroup.setAttribute("stroke-width", strokeWidth);
+}
+
+function getGateStrokeWidthForZoom(zoomLevel) {
+    return GATE_BASE_STROKE_WIDTH / zoomLevel;
 }
 
 function drawGrid(config, labelFontSize) {

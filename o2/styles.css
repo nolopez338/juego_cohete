@@ -1,0 +1,263 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #111;
+    color: white;
+    font-family: Arial;
+}
+
+/* MAP ONLY — gets zoomed + translated */
+#zoomContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+}
+
+/* Large map so off-screen trajectory becomes visible when zooming out */
+#gameArea {
+    position: relative;
+    width: 3000px;
+    height: 3000px;
+    background: #222;
+    overflow: visible;
+}
+
+#gridSvg,
+#gateSvg,
+#trailSvg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3000px;
+    height: 3000px;
+    pointer-events: none;
+}
+
+#gridSvg {
+    z-index: 0;
+}
+
+#gateSvg {
+    z-index: 1;
+}
+
+#trailSvg {
+    z-index: 2;
+}
+
+.rocket {
+    position: absolute;
+    width: 40px;
+    height: 64px;
+    transform-origin: center;
+    transform: scale(var(--rocket-zoom-compensation, 1));
+    z-index: 3;
+    pointer-events: none;
+}
+
+.rocketIcon {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* UI stays normal size (NOT affected by zoom) */
+#topPanelRow {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    z-index: 20;
+}
+
+#gateControls {
+    min-width: 520px;
+}
+
+#savedLevelsPanel {
+    min-width: 240px;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 15px;
+    border-radius: 10px;
+}
+
+.panelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: move;
+    user-select: none;
+}
+
+.panelToggle {
+    background: #262626;
+    color: #fff;
+    border: 1px solid #5f5f5f;
+    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.panelToggle:hover {
+    background-color: #333;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
+}
+
+.panelToggle:active {
+    transform: scale(0.95);
+}
+
+.panelBody {
+    overflow: hidden;
+    max-height: 800px;
+    opacity: 1;
+    transition: max-height 0.25s ease, opacity 0.25s ease;
+}
+
+.panel.collapsed .panelBody {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.panel.dragging {
+    cursor: grabbing;
+}
+
+#gateControls button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    background: #1e90ff;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.secondaryBtn {
+    background: #444;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #666;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease;
+}
+
+.secondaryBtn:hover {
+    background: #555;
+}
+
+#gateList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 220px;
+    overflow: auto;
+}
+
+.savedLevelButtons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.savedLevelButtons button {
+    width: 100%;
+}
+
+.gateItem {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 6px 8px;
+    border-radius: 8px;
+}
+
+.gateItem button {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.gateItem .saveBtn { background: #28a745; color: white; }
+.gateItem .removeBtn { background: #c0392b; color: white; }
+
+.controlRow {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.controlRow input[type="range"] {
+    width: 150px;
+}
+
+.numInput {
+    width: 60px;
+    text-align: center;
+    font-size: 16px;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 3px;
+}
+
+.rangeLimitInput {
+    width: 70px;
+    text-align: center;
+    font-size: 14px;
+    background: #2b2b2b;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 3px;
+}
+
+#scoreDisplay {
+    z-index: 30;
+    position: absolute;
+}
+
+.scoreRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+#scoreDisplay {
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 18px;
+    border-radius: 10px;
+    min-width: 220px;
+}
+

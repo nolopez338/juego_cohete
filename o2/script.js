@@ -8,6 +8,7 @@ const gateControlsPanel = document.getElementById("gateControls");
 const gateList = document.getElementById("gateList");
 const savedLevelsPanel = document.getElementById("savedLevelsPanel");
 const savedLevelsList = document.getElementById("savedLevelsList");
+const generalConfigPanel = document.getElementById("generalConfigPanel");
 const DESIRED_VIEW_RANGE = 60; // Shows -30 to 30 on both axes
 const MAX_ZOOM = 30;
 let zoom = 1;
@@ -1345,15 +1346,17 @@ function renderSavedLevelButtons() {
 
 makePanelDraggable(topControlsPanel);
 makePanelDraggable(topControlsPanelB);
+makePanelDraggable(generalConfigPanel);
 makePanelDraggable(gateControlsPanel);
 makePanelDraggable(savedLevelsPanel);
 initializeCollapsible(topControlsPanel);
 initializeCollapsible(topControlsPanelB);
+initializeCollapsible(generalConfigPanel);
 initializeCollapsible(gateControlsPanel);
 initializeCollapsible(savedLevelsPanel);
 
 window.addEventListener("resize", () => {
-    [topControlsPanel, topControlsPanelB, gateControlsPanel, savedLevelsPanel].forEach(panel => {
+    [topControlsPanel, topControlsPanelB, generalConfigPanel, gateControlsPanel, savedLevelsPanel].forEach(panel => {
         if (!panel || panel.classList.contains("collapsed")) return;
         const body = panel.querySelector(".panelBody");
         if (!body) return;

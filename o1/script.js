@@ -3,6 +3,8 @@
 // ====================================================
 const DEFAULT_ROCKET_SIZE = 1;
 
+const superMenu = document.getElementById("superMenu");
+const superMenuToggle = document.getElementById("superMenuToggle");
 const zoomContainer = document.getElementById("zoomContainer");
 const gateControlsPanel = document.getElementById("gateControls");
 const gateList = document.getElementById("gateList");
@@ -100,6 +102,7 @@ const gameArea = document.getElementById("gameArea");
 const gateSvg = document.getElementById("gateSvg");
 
 const topControlsPanel = document.getElementById("topControls");
+const generalConfigPanel = document.getElementById("generalConfigPanel");
 
 const totalGatesLabel = document.getElementById("totalGatesCount");
 const hitsLabel = document.getElementById("hitsCount");
@@ -507,6 +510,19 @@ function refreshPanelBodyHeight(panel) {
     const body = panel.querySelector(".panelBody");
     if (!body || panel.classList.contains("collapsed")) return;
     body.style.maxHeight = `${body.scrollHeight}px`;
+}
+
+function setSuperMenuCollapsed(collapsed) {
+    if (!superMenu || !superMenuToggle) return;
+
+    superMenu.classList.toggle("collapsed", collapsed);
+    superMenuToggle.textContent = collapsed ? "›" : "‹";
+    superMenuToggle.setAttribute("aria-expanded", (!collapsed).toString());
+
+    if (!collapsed) {
+        [topControlsPanel, generalConfigPanel, gateControlsPanel, savedLevelsPanel]
+            .forEach(refreshPanelBodyHeight);
+    }
 }
 
 // UTILS
@@ -1139,14 +1155,25 @@ function renderSavedLevelButtons() {
 }
 
 makePanelDraggable(topControlsPanel);
+makePanelDraggable(generalConfigPanel);
 makePanelDraggable(gateControlsPanel);
 makePanelDraggable(savedLevelsPanel);
 initializeCollapsible(topControlsPanel);
+initializeCollapsible(generalConfigPanel);
 initializeCollapsible(gateControlsPanel);
 initializeCollapsible(savedLevelsPanel);
 
+if (superMenuToggle && superMenu) {
+    superMenuToggle.addEventListener("click", () => {
+        const shouldCollapse = !superMenu.classList.contains("collapsed");
+        setSuperMenuCollapsed(shouldCollapse);
+    });
+
+    setSuperMenuCollapsed(false);
+}
+
 window.addEventListener("resize", () => {
-    [topControlsPanel, gateControlsPanel, savedLevelsPanel].forEach(panel => {
+    [topControlsPanel, generalConfigPanel, gateControlsPanel, savedLevelsPanel].forEach(panel => {
         if (!panel || panel.classList.contains("collapsed")) return;
         const body = panel.querySelector(".panelBody");
         if (!body) return;

@@ -63,15 +63,60 @@ body {
 }
 
 /* UI stays normal size (NOT affected by zoom) */
-#topPanelRow {
+.supermenu {
     position: absolute;
     top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 10px;
     display: flex;
-    gap: 12px;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 12px 12px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(4px);
+    width: min(520px, 95vw);
     z-index: 20;
+    transition: width 0.25s ease, padding 0.25s ease;
+}
+
+.superMenuHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    user-select: none;
+}
+
+.superMenuTitle {
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+#topPanelRow {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    width: 100%;
+}
+
+.supermenu.collapsed {
+    width: 46px;
+    padding: 12px 8px;
+}
+
+.supermenu.collapsed #topPanelRow {
+    display: none;
+}
+
+.supermenu.collapsed .superMenuHeader {
+    flex-direction: column-reverse;
+    writing-mode: vertical-rl;
+    align-items: center;
+}
+
+.supermenu.collapsed .superMenuTitle {
+    transform: rotate(180deg);
 }
 
 #gateControls {
@@ -89,6 +134,7 @@ body {
     background: rgba(0, 0, 0, 0.4);
     padding: 10px 15px;
     border-radius: 10px;
+    width: 100%;
 }
 
 .panelHeader {

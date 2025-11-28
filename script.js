@@ -87,6 +87,7 @@ const gateTopLabel = document.getElementById("gateTopLabel");
 const gateBottomLabel = document.getElementById("gateBottomLabel");
 
 const topControlsPanel = document.getElementById("topControls");
+const gateControlsPanel = document.getElementById("gateControls");
 const gateInfoPanel = document.getElementById("gateInfo");
 
 const totalGatesLabel = document.getElementById("totalGatesCount");
@@ -697,12 +698,14 @@ registerSlider(quadSlider);
 registerSlider(cubicSlider);
 
 makePanelDraggable(topControlsPanel);
+makePanelDraggable(gateControlsPanel);
 makePanelDraggable(gateInfoPanel);
 initializeCollapsible(topControlsPanel);
+initializeCollapsible(gateControlsPanel);
 initializeCollapsible(gateInfoPanel);
 
 window.addEventListener("resize", () => {
-    [topControlsPanel, gateInfoPanel].forEach(panel => {
+    [topControlsPanel, gateControlsPanel, gateInfoPanel].forEach(panel => {
         if (!panel || panel.classList.contains("collapsed")) return;
         const body = panel.querySelector(".panelBody");
         if (!body) return;

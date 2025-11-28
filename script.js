@@ -123,6 +123,7 @@ const rocketSizeSlider = document.getElementById("rocketSizeSlider");
 const rocketSizeInput = document.getElementById("rocketSizeInput");
 
 const resetBtn = document.getElementById("resetBtn");
+const restartBtn = document.getElementById("restartBtn");
 const nextBtn = document.getElementById("nextBtn");
 
 const sliderDefaults = {
@@ -782,6 +783,11 @@ function resetGame() {
     resetRocket();
 }
 
+function nextRun() {
+    clearGates();
+    resetRocket();
+}
+
 function nextIteration() {
     resetSlidersToDefaults();
     clearGates();
@@ -908,7 +914,8 @@ addGateBtn.onclick = () => {
 };
 
 resetBtn.onclick = () => resetGame();
-nextBtn.onclick = () => nextIteration();
+restartBtn.onclick = () => nextIteration();
+nextBtn.onclick = () => nextRun();
 
 // VIEWPORT SETUP
 function setDefaultView() {

@@ -127,6 +127,7 @@ const slopeMaxInput = document.getElementById("slopeMaxInput");
 const quadMaxInput = document.getElementById("quadMaxInput");
 const cubicMaxInput = document.getElementById("cubicMaxInput");
 
+const rocketSizeLabel = document.getElementById("rocketSizeLabel");
 const rocketSizeSlider = document.getElementById("rocketSizeSlider");
 const rocketSizeInput = document.getElementById("rocketSizeInput");
 const rocketSizeSetBtn = document.getElementById("rocketSizeSetBtn");
@@ -987,6 +988,9 @@ rocketSizeInput.oninput = () => {
 };
 rocketSizeSetBtn.onclick = () => {
     rocketSizeLocked = true;
+    if (rocketSizeLabel) rocketSizeLabel.remove();
+    rocketSizeSlider.remove();
+    rocketSizeSetBtn.remove();
     updateRocketSizeControls();
 };
 

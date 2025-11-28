@@ -3,29 +3,34 @@
 // ====================================================
 const zoomContainer = document.getElementById("zoomContainer");
 let zoom = 1;
-let zoomX = 0;
-let zoomY = 0;
+let translateX = 0;
+let translateY = 0;
+
+function applyTransform() {
+    zoomContainer.style.transform =
+        `scale(${zoom}) translate(${translateX}px, ${translateY}px)`;
+}
 
 // --- MOUSE ZOOM ---
 document.addEventListener("wheel", (e) => {
     e.preventDefault();
 
-    const zoomFactor = 0.1;
-    const oldZoom = zoom;
+    const zoomStep = 1.1;
+    const rect = zoomContainer.getBoundingClientRect();
 
-    if (e.deltaY < 0) zoom += zoomFactor;
-    else zoom -= zoomFactor;
+    const pointerX = e.clientX - rect.left;
+    const pointerY = e.clientY - rect.top;
 
+    const worldX = (pointerX - translateX) / zoom;
+    const worldY = (pointerY - translateY) / zoom;
+
+    zoom = e.deltaY < 0 ? zoom * zoomStep : zoom / zoomStep;
     zoom = Math.min(Math.max(zoom, 0.2), 3);
 
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
+    translateX = pointerX - worldX * zoom;
+    translateY = pointerY - worldY * zoom;
 
-    zoomX = mouseX - ((mouseX - zoomX) * (zoom / oldZoom));
-    zoomY = mouseY - ((mouseY - zoomY) * (zoom / oldZoom));
-
-    zoomContainer.style.transform =
-        `translate(${zoomX}px, ${zoomY}px) scale(${zoom})`;
+    applyTransform();
 
 }, { passive: false });
 
@@ -35,8 +40,8 @@ let startX = 0, startY = 0;
 
 document.addEventListener("mousedown", (e) => {
     isPanning = true;
-    startX = e.clientX - zoomX;
-    startY = e.clientY - zoomY;
+    startX = e.clientX - translateX;
+    startY = e.clientY - translateY;
 });
 
 document.addEventListener("mouseup", () => {
@@ -46,11 +51,10 @@ document.addEventListener("mouseup", () => {
 document.addEventListener("mousemove", (e) => {
     if (!isPanning) return;
 
-    zoomX = e.clientX - startX;
-    zoomY = e.clientY - startY;
+    translateX = e.clientX - startX;
+    translateY = e.clientY - startY;
 
-    zoomContainer.style.transform =
-        `translate(${zoomX}px, ${zoomY}px) scale(${zoom})`;
+    applyTransform();
 });
 
 // ====================================================

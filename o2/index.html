@@ -17,6 +17,56 @@
     </div>
 
     <div id="topPanelRow">
+        <div id="generalConfigPanel" class="panel">
+            <div class="panelHeader">
+                <span>General Configuration</span>
+                <button class="panelToggle" data-target="generalConfigPanel" aria-label="Toggle general configuration panel">−</button>
+            </div>
+            <div class="panelBody">
+                <div class="controlRow">
+                    <span id="differenceToggleLabel">Show Difference Path</span>
+                    <label class="toggleLabel">
+                        <input type="checkbox" id="differenceToggle" checked>
+                        <span>Toggle</span>
+                    </label>
+                </div>
+
+                <div class="controlRow">
+                    <span id="rocketSizeLabel">Rocket Size</span>
+                    <input type="range" id="rocketSizeSlider" min="0.5" max="2" step="0.05" value="1">
+                    <button id="rocketSizeSetBtn" class="secondaryBtn">Set</button>
+                </div>
+
+                <div class="controlRow">
+                    <span id="trailWidthLabel">Trajectory Width</span>
+                    <input type="range" id="trailWidthSlider" min="1" max="10" step="0.5" value="3">
+                    <button id="trailWidthSetBtn" class="secondaryBtn">Set</button>
+                </div>
+
+                <div class="controlRow">
+                    <span id="gateWidthLabel">Gate Width</span>
+                    <input type="range" id="gateWidthSlider" min="1" max="10" step="0.5" value="3">
+                    <button id="gateWidthSetBtn" class="secondaryBtn">Set</button>
+                </div>
+
+                <div class="controlRow">
+                    <span id="axisWidthLabel">XY-Axis Width</span>
+                    <input type="range" id="axisWidthSlider" min="0.5" max="6" step="0.1" value="2">
+                    <button id="axisWidthSetBtn" class="secondaryBtn">Set</button>
+                </div>
+
+                <div class="controlRow">
+                    <button id="resetBtn" class="secondaryBtn">Reset</button>
+                    <button id="restartBtn" class="secondaryBtn">Restart</button>
+                    <button id="nextBtn" class="secondaryBtn">Next</button>
+                </div>
+
+                <div class="controlRow">
+                    <button id="downloadStatsBtn" class="secondaryBtn">Download Stats PDF</button>
+                </div>
+            </div>
+        </div>
+
         <div id="topControls" class="panel">
             <div class="panelHeader">
                 <span>Rocket 1 Sliders</span>
@@ -93,56 +143,6 @@
                     <input type="range" id="cubicSliderB" min="-0.01" max="0.01" step="0.0001" value="0">
                     <input type="number" id="cubicInputB" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
                     <input type="number" id="cubicMaxInputB" class="rangeLimitInput" value="0.01" step="0.0001">
-                </div>
-            </div>
-        </div>
-
-        <div id="generalConfigPanel" class="panel">
-            <div class="panelHeader">
-                <span>General Configuration</span>
-                <button class="panelToggle" data-target="generalConfigPanel" aria-label="Toggle general configuration panel">−</button>
-            </div>
-            <div class="panelBody">
-                <div class="controlRow">
-                    <span id="differenceToggleLabel">Show Difference Path</span>
-                    <label class="toggleLabel">
-                        <input type="checkbox" id="differenceToggle" checked>
-                        <span>Toggle</span>
-                    </label>
-                </div>
-
-                <div class="controlRow">
-                    <span id="rocketSizeLabel">Rocket Size</span>
-                    <input type="range" id="rocketSizeSlider" min="0.5" max="2" step="0.05" value="1">
-                    <button id="rocketSizeSetBtn" class="secondaryBtn">Set</button>
-                </div>
-
-                <div class="controlRow">
-                    <span id="trailWidthLabel">Trajectory Width</span>
-                    <input type="range" id="trailWidthSlider" min="1" max="10" step="0.5" value="3">
-                    <button id="trailWidthSetBtn" class="secondaryBtn">Set</button>
-                </div>
-
-                <div class="controlRow">
-                    <span id="gateWidthLabel">Gate Width</span>
-                    <input type="range" id="gateWidthSlider" min="1" max="10" step="0.5" value="3">
-                    <button id="gateWidthSetBtn" class="secondaryBtn">Set</button>
-                </div>
-
-                <div class="controlRow">
-                    <span id="axisWidthLabel">XY-Axis Width</span>
-                    <input type="range" id="axisWidthSlider" min="0.5" max="6" step="0.1" value="2">
-                    <button id="axisWidthSetBtn" class="secondaryBtn">Set</button>
-                </div>
-
-                <div class="controlRow">
-                    <button id="resetBtn" class="secondaryBtn">Reset</button>
-                    <button id="restartBtn" class="secondaryBtn">Restart</button>
-                    <button id="nextBtn" class="secondaryBtn">Next</button>
-                </div>
-
-                <div class="controlRow">
-                    <button id="downloadStatsBtn" class="secondaryBtn">Download Stats PDF</button>
                 </div>
             </div>
         </div>

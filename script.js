@@ -601,25 +601,20 @@ function resetRocket() {
     lastTrailX = null;
     lastTrailY = null;
 
+    const yCenter = parseFloat(ySlider.value);
+    const safeYCenter = Number.isFinite(yCenter) ? yCenter : 0;
+
     rocketX = WORLD_CENTER - rocket.clientWidth / 2;
-    rocketY = WORLD_CENTER - rocket.clientHeight / 2;
+    rocketY = convertCenterToScreen(safeYCenter);
 
     rocket.style.left = rocketX + "px";
     rocket.style.top  = rocketY + "px";
-
-    slope = quad = cubic = 0;
-    slopeSlider.value = slopeInput.value = 0;
-    quadSlider.value  = quadInput.value  = 0;
-    cubicSlider.value = cubicInput.value = 0;
 
     frameCount = 0;
 
     frozen = false;
     endThresholdX = null;
     lastGateTargetX = null;
-
-    const c = convertScreenToCenter(rocketY);
-    ySlider.value = yInput.value = c;
 
     inFlight = false;
     roundFinished = false;

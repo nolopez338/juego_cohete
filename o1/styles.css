@@ -75,7 +75,7 @@ body {
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(4px);
     box-sizing: border-box;
-    width: min(760px, 96vw);
+    width: min(760px, calc(100vw - 20px));
     max-height: calc(100vh - 20px);
     overflow-y: auto;
     overflow-x: hidden;
@@ -123,12 +123,9 @@ body {
     transform: rotate(180deg);
 }
 
-#gateControls {
-    min-width: 520px;
-}
-
-#savedLevelsPanel {
-    min-width: 240px;
+.supermenu,
+.panel {
+    min-width: 0;
 }
 
 .panel {
@@ -228,7 +225,7 @@ body {
 
 .savedLevelButtons {
     display: grid;
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 10px;
 }
 
@@ -260,7 +257,8 @@ body {
     display: flex;
     gap: 10px;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
 }
 
 .controlRow input[type="range"] {

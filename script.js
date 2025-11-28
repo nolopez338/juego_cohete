@@ -2,6 +2,8 @@
 // ZOOM + PAN SYSTEM  (MAP ONLY)
 // ====================================================
 const zoomContainer = document.getElementById("zoomContainer");
+const gateControlsPanel = document.getElementById("gateControls");
+const gateList = document.getElementById("gateList");
 let zoom = 1;
 let translateX = 0;
 let translateY = 0;
@@ -24,6 +26,13 @@ function centerGraphOnRocket() {
 
 // --- MOUSE ZOOM ---
 document.addEventListener("wheel", (e) => {
+    const isOverGatePanel = gateControlsPanel.contains(e.target);
+    if (isOverGatePanel) {
+        e.preventDefault();
+        gateList.scrollTop += e.deltaY;
+        return;
+    }
+
     e.preventDefault();
 
     const zoomStep = 1.1;
@@ -84,7 +93,6 @@ const gateTopLabel = document.getElementById("gateTopLabel");
 const gateBottomLabel = document.getElementById("gateBottomLabel");
 
 const topControlsPanel = document.getElementById("topControls");
-const gateControlsPanel = document.getElementById("gateControls");
 const gateInfoPanel = document.getElementById("gateInfo");
 
 const totalGatesLabel = document.getElementById("totalGatesCount");
@@ -111,8 +119,6 @@ const gateXInput = document.getElementById("gateXInput");
 const gateY1Input = document.getElementById("gateY1Input");
 const gateY2Input = document.getElementById("gateY2Input");
 const addGateBtn = document.getElementById("addGateBtn");
-const gateList = document.getElementById("gateList");
-
 const gridCanvas = document.getElementById("gridCanvas");
 const gridCtx = gridCanvas.getContext("2d");
 
@@ -337,6 +343,12 @@ function initializeCollapsible(panel) {
     setButtonLabel();
 }
 
+function refreshPanelBodyHeight(panel) {
+    const body = panel.querySelector(".panelBody");
+    if (!body || panel.classList.contains("collapsed")) return;
+    body.style.maxHeight = `${body.scrollHeight}px`;
+}
+
 // UTILS
 function convertCenterToScreen(value) {
     return WORLD_CENTER - value - rocket.clientHeight / 2;
@@ -395,6 +407,7 @@ function renderGateList() {
         empty.textContent = "No gates yet.";
         empty.style.textAlign = "center";
         gateList.appendChild(empty);
+        refreshPanelBodyHeight(gateControlsPanel);
         return;
     }
 
@@ -475,6 +488,8 @@ function renderGateList() {
 
         gateList.appendChild(row);
     });
+
+    refreshPanelBodyHeight(gateControlsPanel);
 }
 
 function validateGateValues(x, y1, y2) {

@@ -538,10 +538,9 @@ function updateRocketSize(maintainCenter = true) {
     }
 }
 
-function updateRocketSizeControls(disabled = false) {
-    const isDisabled = disabled || rocketSizeLocked;
-    rocketSizeSlider.disabled = isDisabled;
-    rocketSizeSetBtn.disabled = disabled || rocketSizeLocked;
+function updateRocketSizeControls() {
+    rocketSizeSlider.disabled = rocketSizeLocked;
+    rocketSizeSetBtn.disabled = rocketSizeLocked;
     rocketSizeSlider.style.display = rocketSizeLocked ? "none" : "";
 }
 
@@ -774,7 +773,7 @@ function setControlsDisabled(disabled) {
         el.disabled = disabled;
     });
 
-    updateRocketSizeControls(disabled);
+    updateRocketSizeControls();
 }
 
 function hideResetButton() {

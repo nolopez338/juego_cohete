@@ -42,6 +42,12 @@
             </div>
 
             <div class="controlRow">
+                <span>Rocket Size</span>
+                <input type="range" id="rocketSizeSlider" min="0.5" max="2" step="0.05" value="1">
+                <input type="number" id="rocketSizeInput" class="numInput" min="0.5" max="2" step="0.05" value="1">
+            </div>
+
+            <div class="controlRow">
                 <button id="resetBtn" class="secondaryBtn">Reset</button>
                 <button id="nextBtn" class="secondaryBtn">Next</button>
             </div>
@@ -100,7 +106,23 @@
             <svg id="gridSvg" xmlns="http://www.w3.org/2000/svg"></svg>
             <svg id="gateSvg" xmlns="http://www.w3.org/2000/svg"></svg>
             <canvas id="trailCanvas"></canvas>
-            <div id="rocket" class="rocket"></div>
+            <div id="rocket" class="rocket" aria-hidden="true">
+                <svg class="rocketIcon" viewBox="0 0 60 90" role="presentation" focusable="false">
+                    <defs>
+                        <linearGradient id="rocketBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ff5f6d" />
+                            <stop offset="100%" stop-color="#ffc371" />
+                        </linearGradient>
+                    </defs>
+                    <g>
+                        <path d="M30 4 C34 12 42 32 42 50 C42 64 37 82 30 86 C23 82 18 64 18 50 C18 32 26 12 30 4 Z" fill="url(#rocketBody)" stroke="#7a1b1b" stroke-width="2" />
+                        <ellipse cx="30" cy="45" rx="9" ry="12" fill="#0d2c54" stroke="#0b1e38" stroke-width="2" />
+                        <path d="M18 52 L8 64 L20 60 Z" fill="#f4a261" stroke="#c77422" stroke-width="2" />
+                        <path d="M42 52 L52 64 L40 60 Z" fill="#f4a261" stroke="#c77422" stroke-width="2" />
+                        <path d="M26 84 C28 88 32 88 34 84 C32 82 28 82 26 84 Z" fill="#f77f00" stroke="#c85c02" stroke-width="2" />
+                    </g>
+                </svg>
+            </div>
         </div>
     </div>
 

@@ -1,5 +1,3 @@
-const ROCKET_SIZE_MULTIPLIER = 1;
-
 // ====================================================
 // ZOOM + PAN SYSTEM  (MAP ONLY)
 // ====================================================
@@ -16,6 +14,7 @@ let sliderActive = false;
 function applyTransform() {
     zoomContainer.style.transform =
         `translate(${translateX}px, ${translateY}px) scale(${zoom})`;
+    updateRocketTransform();
 }
 
 function centerGraphOnRocket() {
@@ -88,12 +87,10 @@ document.addEventListener("mousemove", (e) => {
 // ====================================================
 
 const rocket = document.getElementById("rocket");
-const baseRocketWidth = rocket.clientWidth;
-const baseRocketHeight = rocket.clientHeight;
-const scaledRocketWidth = baseRocketWidth * ROCKET_SIZE_MULTIPLIER;
-const scaledRocketHeight = baseRocketHeight * ROCKET_SIZE_MULTIPLIER;
-rocket.style.width = `${scaledRocketWidth}px`;
-rocket.style.height = `${scaledRocketHeight}px`;
+const ROCKET_BASE_WIDTH = 40;
+const ROCKET_BASE_HEIGHT = 64;
+rocket.style.width = `${ROCKET_BASE_WIDTH}px`;
+rocket.style.height = `${ROCKET_BASE_HEIGHT}px`;
 const gameArea = document.getElementById("gameArea");
 
 const gateSvg = document.getElementById("gateSvg");
@@ -123,6 +120,9 @@ const quadInput = document.getElementById("quadInput");
 const cubicSlider = document.getElementById("cubicSlider");
 const cubicInput = document.getElementById("cubicInput");
 
+const rocketSizeSlider = document.getElementById("rocketSizeSlider");
+const rocketSizeInput = document.getElementById("rocketSizeInput");
+
 const resetBtn = document.getElementById("resetBtn");
 const nextBtn = document.getElementById("nextBtn");
 
@@ -131,6 +131,7 @@ const sliderDefaults = {
     slope: parseFloat(slopeSlider.defaultValue),
     quad: parseFloat(quadSlider.defaultValue),
     cubic: parseFloat(cubicSlider.defaultValue),
+    rocketSize: parseFloat(rocketSizeSlider.defaultValue),
 };
 
 const gateXInput = document.getElementById("gateXInput");
@@ -157,11 +158,16 @@ canvas.width = MAP_SIZE;
 canvas.height = MAP_SIZE;
 
 let rocketX, rocketY;
+let rocketSize = parseFloat(rocketSizeSlider.value) || 1;
 let slope = 0;
 let quad = 0;
 let cubic = 0;
 let speed = 6;
 let facing = "right";
+let rocketAngle = 90;
+
+setRocketSize(rocketSize, false);
+updateRocketTransform();
 
 let anim = null;
 let lastTrailX = null;
@@ -396,6 +402,42 @@ function toScreenX(value) {
 
 function toScreenY(value) {
     return WORLD_CENTER - value;
+}
+
+function updateRocketTransform() {
+    const zoomCompensation = 1 / zoom;
+    rocket.style.setProperty("--rocket-zoom-compensation", zoomCompensation);
+    rocket.style.transform = `scale(${zoomCompensation}) rotate(${rocketAngle}deg)`;
+}
+
+function updateRocketSize(maintainCenter = true) {
+    const previousWidth = rocket.clientWidth;
+    const previousHeight = rocket.clientHeight;
+    const canMaintainCenter = maintainCenter &&
+        rocketX !== undefined && rocketY !== undefined;
+    const centerX = canMaintainCenter ? rocketX + previousWidth / 2 : null;
+    const centerY = canMaintainCenter ? rocketY + previousHeight / 2 : null;
+
+    const width = ROCKET_BASE_WIDTH * rocketSize;
+    const height = ROCKET_BASE_HEIGHT * rocketSize;
+
+    rocket.style.width = `${width}px`;
+    rocket.style.height = `${height}px`;
+
+    if (canMaintainCenter) {
+        rocketX = centerX - width / 2;
+        rocketY = centerY - height / 2;
+        rocket.style.left = rocketX + "px";
+        rocket.style.top = rocketY + "px";
+    }
+}
+
+function setRocketSize(value, maintainCenter = true) {
+    const clamped = Math.min(Math.max(value, 0.5), 2);
+    rocketSize = clamped;
+    rocketSizeSlider.value = clamped;
+    rocketSizeInput.value = clamped.toFixed(2).replace(/\.00$/, "");
+    updateRocketSize(maintainCenter);
 }
 
 // GATES
@@ -663,6 +705,8 @@ function resetSlidersToDefaults() {
     cubicSlider.value = sliderDefaults.cubic;
     cubicInput.value = sliderDefaults.cubic;
     cubic = sliderDefaults.cubic;
+
+    setRocketSize(sliderDefaults.rocketSize);
 }
 
 // RESET
@@ -769,6 +813,15 @@ cubicInput.oninput = () => {
     cubic = v;
 };
 
+rocketSizeSlider.oninput = () => {
+    setRocketSize(parseFloat(rocketSizeSlider.value));
+};
+rocketSizeInput.oninput = () => {
+    let v = parseFloat(rocketSizeInput.value);
+    if (isNaN(v)) v = rocketSize;
+    setRocketSize(v);
+};
+
 function registerSlider(slider) {
     ["mousedown", "touchstart"].forEach(evt => {
         slider.addEventListener(evt, () => sliderActive = true);
@@ -783,6 +836,7 @@ registerSlider(ySlider);
 registerSlider(slopeSlider);
 registerSlider(quadSlider);
 registerSlider(cubicSlider);
+registerSlider(rocketSizeSlider);
 
 makePanelDraggable(topControlsPanel);
 makePanelDraggable(gateControlsPanel);
@@ -1017,8 +1071,8 @@ function drawTrail(x1, y1, x2, y2) {
 function rotateRocket(dir) {
     if (inFlight || frozen) return;
     facing = dir;
-    rocket.style.transform =
-        dir === "right" ? "rotate(90deg)" : "rotate(-90deg)";
+    rocketAngle = dir === "right" ? 90 : -90;
+    updateRocketTransform();
     updateGateInfo();
 }
 

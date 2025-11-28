@@ -190,6 +190,7 @@ const GRID_ZOOM_STEPS = [
 ];
 
 let currentGridConfig = null;
+let currentLabelFontSize = null;
 
 class ScoreBoard {
     constructor(hitsEl, missesEl, totalEl, hitDotsEl, missDotsEl) {
@@ -802,19 +803,45 @@ function getGridConfigForZoom(zoomLevel) {
     return GRID_ZOOM_STEPS.find(step => zoomPercent <= step.maxPercent);
 }
 
+function getLabelFontSizeForZoom(zoomLevel) {
+    const targetScreenSize = 14;
+    const minScreenSize = 10;
+    const maxScreenSize = 18;
+
+    const fontSize = targetScreenSize / zoomLevel;
+    const minSize = minScreenSize / zoomLevel;
+    const maxSize = maxScreenSize / zoomLevel;
+
+    return Math.min(Math.max(fontSize, minSize), maxSize);
+}
+
 function updateGridForZoom() {
     const config = getGridConfigForZoom(zoom);
     if (!config) return;
+
+    const labelFontSize = getLabelFontSizeForZoom(zoom);
     const spacingChanged = !currentGridConfig ||
         config.gridSpacing !== currentGridConfig.gridSpacing;
+    const labelSizeChanged = currentLabelFontSize === null ||
+        Math.abs(labelFontSize - currentLabelFontSize) > 0.01;
 
     if (spacingChanged) {
         currentGridConfig = config;
-        drawGrid(config);
+        currentLabelFontSize = labelFontSize;
+        drawGrid(config, labelFontSize);
+        return;
+    }
+
+    if (labelSizeChanged) {
+        const labelGroup = gridSvg.querySelector('[data-role="grid-labels"]');
+        if (labelGroup) {
+            labelGroup.setAttribute("font-size", labelFontSize);
+        }
+        currentLabelFontSize = labelFontSize;
     }
 }
 
-function drawGrid(config) {
+function drawGrid(config, labelFontSize) {
     const gridSpacing = config.gridSpacing;
     const tickLength = 12;
     const centerX = MAP_SIZE / 2;
@@ -874,8 +901,9 @@ function drawGrid(config) {
     tickGroup.setAttribute("shape-rendering", "crispEdges");
 
     const labelGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    labelGroup.dataset.role = "grid-labels";
     labelGroup.setAttribute("fill", "#b0b0b0");
-    labelGroup.setAttribute("font-size", "12");
+    labelGroup.setAttribute("font-size", labelFontSize);
     labelGroup.setAttribute("font-family", "Arial, sans-serif");
 
     function createLine(x1, y1, x2, y2) {

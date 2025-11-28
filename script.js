@@ -27,10 +27,8 @@ document.addEventListener("wheel", (e) => {
     e.preventDefault();
 
     const zoomStep = 1.1;
-    const rect = zoomContainer.getBoundingClientRect();
-
-    const pointerX = e.clientX - rect.left;
-    const pointerY = e.clientY - rect.top;
+    const pointerX = e.clientX;
+    const pointerY = e.clientY;
 
     const worldX = (pointerX - translateX) / zoom;
     const worldY = (pointerY - translateY) / zoom;

@@ -129,7 +129,6 @@ const cubicMaxInput = document.getElementById("cubicMaxInput");
 
 const rocketSizeLabel = document.getElementById("rocketSizeLabel");
 const rocketSizeSlider = document.getElementById("rocketSizeSlider");
-const rocketSizeInput = document.getElementById("rocketSizeInput");
 const rocketSizeSetBtn = document.getElementById("rocketSizeSetBtn");
 
 const trailWidthLabel = document.getElementById("trailWidthLabel");
@@ -542,7 +541,6 @@ function updateRocketSize(maintainCenter = true) {
 function updateRocketSizeControls(disabled = false) {
     const isDisabled = disabled || rocketSizeLocked;
     rocketSizeSlider.disabled = isDisabled;
-    rocketSizeInput.disabled = isDisabled;
     rocketSizeSetBtn.disabled = disabled || rocketSizeLocked;
     rocketSizeSlider.style.display = rocketSizeLocked ? "none" : "";
 }
@@ -551,7 +549,6 @@ function setRocketSize(value, maintainCenter = true) {
     const clamped = Math.min(Math.max(value, 0.5), 2);
     rocketSize = clamped;
     rocketSizeSlider.value = clamped;
-    rocketSizeInput.value = clamped.toFixed(2).replace(/\.00$/, "");
     updateRocketSize(maintainCenter);
 }
 
@@ -999,11 +996,6 @@ setupRangeLimits({
 
 rocketSizeSlider.oninput = () => {
     setRocketSize(parseFloat(rocketSizeSlider.value));
-};
-rocketSizeInput.oninput = () => {
-    let v = parseFloat(rocketSizeInput.value);
-    if (isNaN(v)) v = rocketSize;
-    setRocketSize(v);
 };
 rocketSizeSetBtn.onclick = () => {
     rocketSizeLocked = true;

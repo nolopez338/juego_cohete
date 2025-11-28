@@ -77,7 +77,9 @@ document.addEventListener("mousemove", (e) => {
 
 const rocket = document.getElementById("rocket");
 const gameArea = document.getElementById("gameArea");
-const gate = document.getElementById("gate");
+
+const gateCanvas = document.getElementById("gateCanvas");
+const gateCtx = gateCanvas.getContext("2d");
 
 const gateXLabel = document.getElementById("gateXLabel");
 const gateTopLabel = document.getElementById("gateTopLabel");
@@ -95,17 +97,29 @@ const quadInput = document.getElementById("quadInput");
 const cubicSlider = document.getElementById("cubicSlider");
 const cubicInput = document.getElementById("cubicInput");
 
+const gateXInput = document.getElementById("gateXInput");
+const gateY1Input = document.getElementById("gateY1Input");
+const gateY2Input = document.getElementById("gateY2Input");
+const addGateBtn = document.getElementById("addGateBtn");
+const gateList = document.getElementById("gateList");
+
 const gridCanvas = document.getElementById("gridCanvas");
 const gridCtx = gridCanvas.getContext("2d");
 
 const canvas = document.getElementById("trailCanvas");
 const ctx = canvas.getContext("2d");
 
-gridCanvas.width = 3000;
-gridCanvas.height = 3000;
+const MAP_SIZE = 3000;
+const WORLD_CENTER = MAP_SIZE / 2;
 
-canvas.width = 3000;
-canvas.height = 3000;
+gridCanvas.width = MAP_SIZE;
+gridCanvas.height = MAP_SIZE;
+
+gateCanvas.width = MAP_SIZE;
+gateCanvas.height = MAP_SIZE;
+
+canvas.width = MAP_SIZE;
+canvas.height = MAP_SIZE;
 
 let rocketX, rocketY;
 let slope = 0;
@@ -125,33 +139,181 @@ let roundFinished = false;
 
 let hits = 0;
 let misses = 0;
-const gateWidth = 150;
+let gates = [];
+let gateIdCounter = 1;
+let gatesCrossed = new Set();
 
 // UTILS
 function convertCenterToScreen(value) {
-    return 1500 - value - rocket.clientHeight / 2;
+    return WORLD_CENTER - value - rocket.clientHeight / 2;
 }
 
 function convertScreenToCenter(y) {
-    return -(y + rocket.clientHeight / 2 - 1500);
+    return -(y + rocket.clientHeight / 2 - WORLD_CENTER);
 }
 
-// GATE
-function spawnGate() {
-    const gapY = Math.random() * (3000 - gateWidth);
+function toScreenX(value) {
+    return WORLD_CENTER + value;
+}
 
-    gate.style.height = gateWidth + "px";
-    gate.style.top = gapY + "px";
+function toScreenY(value) {
+    return WORLD_CENTER - value;
+}
 
-    const left = facing === "right"
-        ? (3000 - gate.clientWidth)
-        : 0;
+// GATES
+function drawGates() {
+    gateCtx.clearRect(0, 0, MAP_SIZE, MAP_SIZE);
+    gateCtx.strokeStyle = "lime";
+    gateCtx.lineWidth = 3;
 
-    gate.style.left = left + "px";
+    gates.forEach(gate => {
+        const x = toScreenX(gate.x);
+        const y1 = toScreenY(gate.y1);
+        const y2 = toScreenY(gate.y2);
+        const gapTop = Math.min(y1, y2);
+        const gapBottom = Math.max(y1, y2);
 
-    gateXLabel.textContent = Math.round(left);
-    gateTopLabel.textContent = Math.round(gapY);
-    gateBottomLabel.textContent = Math.round(gapY + gateWidth);
+        gateCtx.beginPath();
+        gateCtx.moveTo(x, 0);
+        gateCtx.lineTo(x, gapTop);
+        gateCtx.stroke();
+
+        gateCtx.beginPath();
+        gateCtx.moveTo(x, gapBottom);
+        gateCtx.lineTo(x, MAP_SIZE);
+        gateCtx.stroke();
+    });
+}
+
+function renderGateList() {
+    gateList.innerHTML = "";
+
+    if (!gates.length) {
+        const empty = document.createElement("div");
+        empty.textContent = "No gates yet.";
+        empty.style.textAlign = "center";
+        gateList.appendChild(empty);
+        return;
+    }
+
+    gates.forEach(gate => {
+        const row = document.createElement("div");
+        row.className = "gateItem";
+
+        const xInput = document.createElement("input");
+        xInput.type = "number";
+        xInput.value = gate.x;
+        xInput.className = "numInput";
+        xInput.step = "50";
+
+        const y1Input = document.createElement("input");
+        y1Input.type = "number";
+        y1Input.value = gate.y1;
+        y1Input.className = "numInput";
+        y1Input.step = "50";
+
+        const y2Input = document.createElement("input");
+        y2Input.type = "number";
+        y2Input.value = gate.y2;
+        y2Input.className = "numInput";
+        y2Input.step = "50";
+
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "Save";
+        saveBtn.className = "saveBtn";
+        saveBtn.onclick = () => {
+            const x = parseFloat(xInput.value);
+            const y1 = parseFloat(y1Input.value);
+            const y2 = parseFloat(y2Input.value);
+
+            if (!validateGateValues(x, y1, y2)) return;
+
+            gate.x = x;
+            gate.y1 = y1;
+            gate.y2 = y2;
+            drawGates();
+            updateGateInfo();
+            renderGateList();
+        };
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "Remove";
+        removeBtn.className = "removeBtn";
+        removeBtn.onclick = () => {
+            gates = gates.filter(g => g.id !== gate.id);
+            drawGates();
+            updateGateInfo();
+            renderGateList();
+        };
+
+        row.append(
+            document.createTextNode("X:"),
+            xInput,
+            document.createTextNode(" Y1:"),
+            y1Input,
+            document.createTextNode(" Y2:"),
+            y2Input,
+            saveBtn,
+            removeBtn
+        );
+
+        gateList.appendChild(row);
+    });
+}
+
+function validateGateValues(x, y1, y2) {
+    if ([x, y1, y2].some(v => Number.isNaN(v))) {
+        alert("Please enter numeric values for X, Y1, and Y2.");
+        return false;
+    }
+
+    if (y1 >= y2) {
+        alert("Gate requires Y1 < Y2 to form a gap.");
+        return false;
+    }
+
+    return true;
+}
+
+function addGate(x, y1, y2) {
+    if (!validateGateValues(x, y1, y2)) return;
+
+    gates.push({ id: gateIdCounter++, x, y1, y2 });
+    drawGates();
+    updateGateInfo();
+    renderGateList();
+}
+
+function getNextGate() {
+    if (!gates.length || rocketX === undefined) return null;
+
+    const rocketCenterX = rocketX + rocket.clientWidth / 2 - WORLD_CENTER;
+    const candidates = gates.filter(gate =>
+        facing === "right" ? gate.x >= rocketCenterX : gate.x <= rocketCenterX
+    );
+
+    if (!candidates.length) return null;
+
+    const sorted = [...candidates].sort((a, b) =>
+        facing === "right" ? a.x - b.x : b.x - a.x
+    );
+
+    return sorted[0];
+}
+
+function updateGateInfo() {
+    const next = getNextGate();
+
+    if (!next) {
+        gateXLabel.textContent = "–";
+        gateTopLabel.textContent = "–";
+        gateBottomLabel.textContent = "–";
+        return;
+    }
+
+    gateXLabel.textContent = Math.round(next.x);
+    gateTopLabel.textContent = Math.round(next.y1);
+    gateBottomLabel.textContent = Math.round(next.y2);
 }
 
 // RESET
@@ -163,8 +325,8 @@ function resetRocket() {
     lastTrailX = null;
     lastTrailY = null;
 
-    rocketX = 1500 - rocket.clientWidth / 2;
-    rocketY = 1500 - rocket.clientHeight / 2;
+    rocketX = WORLD_CENTER - rocket.clientWidth / 2;
+    rocketY = WORLD_CENTER - rocket.clientHeight / 2;
 
     rocket.style.left = rocketX + "px";
     rocket.style.top  = rocketY + "px";
@@ -181,9 +343,10 @@ function resetRocket() {
 
     inFlight = false;
     roundFinished = false;
+    gatesCrossed = new Set();
 
     centerGraphOnRocket();
-    spawnGate();
+    updateGateInfo();
 }
 
 // BEFORE LAUNCH
@@ -254,6 +417,14 @@ registerSlider(ySlider);
 registerSlider(slopeSlider);
 registerSlider(quadSlider);
 registerSlider(cubicSlider);
+
+addGateBtn.onclick = () => {
+    const x = parseFloat(gateXInput.value);
+    const y1 = parseFloat(gateY1Input.value);
+    const y2 = parseFloat(gateY2Input.value);
+
+    addGate(x, y1, y2);
+};
 
 // GRID
 function drawGrid() {
@@ -361,6 +532,7 @@ function drawGrid() {
 }
 
 drawGrid();
+drawGates();
 
 // TRAIL
 function drawTrail(x1, y1, x2, y2) {
@@ -378,6 +550,7 @@ function rotateRocket(dir) {
     facing = dir;
     rocket.style.transform =
         dir === "right" ? "rotate(90deg)" : "rotate(-90deg)";
+    updateGateInfo();
 }
 
 // LAUNCH
@@ -386,6 +559,7 @@ function launchRocket() {
 
     inFlight = true;
     frameCount = 0;
+    gatesCrossed = new Set();
 
     function update() {
 
@@ -412,7 +586,7 @@ function launchRocket() {
         lastTrailX = newX;
         lastTrailY = newY;
 
-        checkCollision();
+        checkCollision(prevX, newX, newY);
         anim = requestAnimationFrame(update);
     }
 
@@ -420,20 +594,39 @@ function launchRocket() {
 }
 
 // COLLISION
-function checkCollision() {
+function checkCollision(prevX, newX, centerY) {
     if (roundFinished) return;
 
-    const gateRect = gate.getBoundingClientRect();
-    const rocketRect = rocket.getBoundingClientRect();
-    const centerY = rocketRect.top + rocketRect.height / 2;
+    const offMap =
+        rocketX < -rocket.clientWidth ||
+        rocketX > MAP_SIZE ||
+        rocketY < -rocket.clientHeight ||
+        rocketY > MAP_SIZE;
 
-    const hit = centerY >= gateRect.top && centerY <= gateRect.bottom;
+    if (offMap) {
+        endLaunch(false);
+        return;
+    }
 
-    if (facing === "right" && rocketRect.right >= gateRect.left)
+    for (const gate of gates) {
+        if (gatesCrossed.has(gate.id)) continue;
+
+        const gateX = toScreenX(gate.x);
+        const crossed = facing === "right"
+            ? prevX <= gateX && newX >= gateX
+            : prevX >= gateX && newX <= gateX;
+
+        if (!crossed) continue;
+
+        gatesCrossed.add(gate.id);
+
+        const gapTop = Math.min(toScreenY(gate.y1), toScreenY(gate.y2));
+        const gapBottom = Math.max(toScreenY(gate.y1), toScreenY(gate.y2));
+        const hit = centerY >= gapTop && centerY <= gapBottom;
+
         endLaunch(hit);
-
-    if (facing === "left" && rocketRect.left <= gateRect.right)
-        endLaunch(hit);
+        return;
+    }
 }
 
 // END
@@ -478,5 +671,6 @@ document.addEventListener("keydown", e => {
     if (e.key === " ") launchRocket();
 });
 
+renderGateList();
 // START GAME
 resetRocket();

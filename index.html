@@ -37,9 +37,9 @@
 </div>
 
 <div id="gateInfo">
-    Gate X: <span id="gateXLabel">0</span><br>
-    Gate Top Y: <span id="gateTopLabel">0</span><br>
-    Gate Bottom Y: <span id="gateBottomLabel">0</span>
+    <div><strong>Next Gate</strong></div>
+    <div>X: <span id="gateXLabel">–</span></div>
+    <div>Gap: <span id="gateTopLabel">–</span> to <span id="gateBottomLabel">–</span></div>
 </div>
 
 <div id="scoreDisplay">
@@ -47,6 +47,19 @@
     <div id="hitsDots"></div>
     <span style="color:red;">Misses:</span> <span id="missCount">0</span>
     <div id="missDots"></div>
+</div>
+
+<div id="gateControls">
+    <div class="controlRow">
+        <span>X</span>
+        <input type="number" id="gateXInput" class="numInput" value="0" step="50">
+        <span>Y1</span>
+        <input type="number" id="gateY1Input" class="numInput" value="-200" step="50">
+        <span>Y2</span>
+        <input type="number" id="gateY2Input" class="numInput" value="200" step="50">
+        <button id="addGateBtn">Add Gate</button>
+    </div>
+    <div id="gateList"></div>
 </div>
 
 <div id="popupOverlay">
@@ -60,9 +73,9 @@
     <div id="zoomContainer">
         <div id="gameArea">
             <canvas id="gridCanvas"></canvas>
+            <canvas id="gateCanvas"></canvas>
             <canvas id="trailCanvas"></canvas>
             <div id="rocket" class="rocket"></div>
-            <div id="gate" class="gate"></div>
         </div>
     </div>
 

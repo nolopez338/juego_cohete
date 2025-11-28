@@ -121,6 +121,7 @@ const cubicInput = document.getElementById("cubicInput");
 
 const rocketSizeSlider = document.getElementById("rocketSizeSlider");
 const rocketSizeInput = document.getElementById("rocketSizeInput");
+const rocketSizeSetBtn = document.getElementById("rocketSizeSetBtn");
 
 const resetBtn = document.getElementById("resetBtn");
 const restartBtn = document.getElementById("restartBtn");
@@ -208,6 +209,7 @@ canvas.height = MAP_SIZE;
 
 let rocketX, rocketY;
 let rocketSize = parseFloat(rocketSizeSlider.value) || DEFAULT_ROCKET_SIZE;
+let rocketSizeLocked = false;
 let slope = 0;
 let quad = 0;
 let cubic = 0;
@@ -216,6 +218,7 @@ let facing = "right";
 let rocketAngle = 90;
 
 setRocketSize(rocketSize, false);
+updateRocketSizeControls();
 updateRocketTransform();
 
 let anim = null;
@@ -506,6 +509,14 @@ function updateRocketSize(maintainCenter = true) {
     }
 }
 
+function updateRocketSizeControls(disabled = false) {
+    const isDisabled = disabled || rocketSizeLocked;
+    rocketSizeSlider.disabled = isDisabled;
+    rocketSizeInput.disabled = isDisabled;
+    rocketSizeSetBtn.disabled = disabled || rocketSizeLocked;
+    rocketSizeSlider.style.display = rocketSizeLocked ? "none" : "";
+}
+
 function setRocketSize(value, maintainCenter = true) {
     const clamped = Math.min(Math.max(value, 0.5), 2);
     rocketSize = clamped;
@@ -724,6 +735,8 @@ function setControlsDisabled(disabled) {
     gateList.querySelectorAll("input, button").forEach(el => {
         el.disabled = disabled;
     });
+
+    updateRocketSizeControls(disabled);
 }
 
 function hideResetButton() {
@@ -881,6 +894,10 @@ rocketSizeInput.oninput = () => {
     let v = parseFloat(rocketSizeInput.value);
     if (isNaN(v)) v = rocketSize;
     setRocketSize(v);
+};
+rocketSizeSetBtn.onclick = () => {
+    rocketSizeLocked = true;
+    updateRocketSizeControls();
 };
 
 function registerSlider(slider) {

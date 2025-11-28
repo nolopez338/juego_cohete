@@ -149,6 +149,7 @@ const axisWidthSetBtn = document.getElementById("axisWidthSetBtn");
 const resetBtn = document.getElementById("resetBtn");
 const restartBtn = document.getElementById("restartBtn");
 const nextBtn = document.getElementById("nextBtn");
+const downloadStatsBtn = document.getElementById("downloadStatsBtn");
 
 const sliderDefaults = {
     y: parseFloat(ySlider.defaultValue),
@@ -425,6 +426,125 @@ class ScoreBoard {
 }
 
 const scoreBoard = new ScoreBoard(hitsLabel, missesLabel, totalGatesLabel, hitsDots, missDots);
+
+const sessionStats = {
+    uniqueGateConfigs: new Set(),
+    totalRocketTries: 0,
+    lastRunTries: 0,
+};
+
+function resetSessionStats() {
+    sessionStats.uniqueGateConfigs.clear();
+    sessionStats.totalRocketTries = 0;
+    sessionStats.lastRunTries = 0;
+}
+
+function serializeGateConfig() {
+    const normalized = [...gates]
+        .map(gate => ({ x: gate.x, y1: gate.y1, y2: gate.y2 }))
+        .sort((a, b) => a.x - b.x || a.y1 - b.y1 || a.y2 - b.y2);
+
+    return JSON.stringify(normalized);
+}
+
+function recordGateConfigurationForStats() {
+    const serialized = serializeGateConfig();
+    sessionStats.uniqueGateConfigs.add(serialized);
+}
+
+function registerRocketTry() {
+    sessionStats.totalRocketTries += 1;
+    sessionStats.lastRunTries = 1;
+}
+
+function undoLastRocketTry() {
+    if (!sessionStats.lastRunTries) return;
+
+    sessionStats.totalRocketTries = Math.max(0, sessionStats.totalRocketTries - sessionStats.lastRunTries);
+    sessionStats.lastRunTries = 0;
+}
+
+function formatHitRatio(hits, misses) {
+    const total = hits + misses;
+    if (!total) return "N/A";
+
+    const proportion = (hits / total).toFixed(2);
+    const percent = (hits / total * 100).toFixed(1);
+    return `${proportion} (${percent}%)`;
+}
+
+function escapePdfText(value) {
+    return String(value).replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+}
+
+function buildStatsPdfContent(lines) {
+    const fontSize = 14;
+    const leading = 18;
+    const startX = 72;
+    const startY = 720;
+
+    const lineCommands = lines.map((line, index) => {
+        const prefix = index === 0 ? "" : `0 -${leading} Td\n`;
+        return `${prefix}(${escapePdfText(line)}) Tj`;
+    }).join("\n");
+
+    const contentStream = `BT\n/F1 ${fontSize} Tf\n${startX} ${startY} Td\n${lineCommands}\nET`;
+
+    let pdf = "%PDF-1.4\n";
+    const offsets = [];
+
+    const addObject = (index, body) => {
+        offsets[index] = pdf.length;
+        pdf += `${index} 0 obj\n${body}\nendobj\n`;
+    };
+
+    addObject(1, "<< /Type /Catalog /Pages 2 0 R >>");
+    addObject(2, "<< /Type /Pages /Count 1 /Kids [3 0 R] >>");
+    addObject(3, "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>");
+    addObject(4, `<< /Length ${contentStream.length} >>\nstream\n${contentStream}\nendstream`);
+    addObject(5, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+
+    const xrefStart = pdf.length;
+    pdf += "xref\n0 6\n";
+    pdf += "0000000000 65535 f \n";
+
+    for (let i = 1; i <= 5; i++) {
+        pdf += offsets[i].toString().padStart(10, "0") + " 00000 n \n";
+    }
+
+    pdf += "trailer\n";
+    pdf += "<< /Size 6 /Root 1 0 R >>\n";
+    pdf += "startxref\n" + xrefStart + "\n";
+    pdf += "%%EOF";
+
+    return pdf;
+}
+
+function downloadStatsPdf() {
+    const hits = scoreBoard.hits;
+    const misses = scoreBoard.misses;
+    const lines = [
+        "Session Statistics",
+        `Unique gate configurations: ${sessionStats.uniqueGateConfigs.size}`,
+        `Total rocket tries: ${sessionStats.totalRocketTries}`,
+        `Gates hit: ${hits}`,
+        `Gates missed: ${misses}`,
+        `Hit-to-total ratio: ${formatHitRatio(hits, misses)}`
+    ];
+
+    const pdfString = buildStatsPdfContent(lines);
+    const blob = new Blob([pdfString], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "session-stats.pdf";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+}
 
 function makePanelDraggable(panel) {
     const header = panel.querySelector(".panelHeader");
@@ -905,6 +1025,7 @@ function resetRocket() {
     gatesCrossed = new Set();
     activeRunGateIds = new Set();
     scoreBoard.resetRun();
+    sessionStats.lastRunTries = 0;
 
     setControlsDisabled(false);
     hideResetButton();
@@ -916,6 +1037,7 @@ function resetRocket() {
 
 function resetGame() {
     scoreBoard.clearLastRunResults();
+    undoLastRocketTry();
     resetRocket();
 }
 
@@ -971,6 +1093,7 @@ function nextIteration() {
     resetSlidersToDefaults();
     clearGates();
     scoreBoard.resetAll();
+    resetSessionStats();
     resetRocket();
 }
 
@@ -1191,7 +1314,13 @@ addGateBtn.onclick = () => {
 
 resetBtn.onclick = () => resetGame();
 restartBtn.onclick = () => nextIteration();
-nextBtn.onclick = () => nextRun();
+nextBtn.onclick = () => {
+    recordGateConfigurationForStats();
+    nextRun();
+};
+if (downloadStatsBtn) {
+    downloadStatsBtn.onclick = () => downloadStatsPdf();
+}
 
 // VIEWPORT SETUP
 function setDefaultView() {
@@ -1465,6 +1594,8 @@ function finalizeRun() {
 // LAUNCH
 function launchRocket() {
     if (inFlight || frozen) return;
+
+    registerRocketTry();
 
     const gatesInPath = getGatesInFlightPath();
     activeRunGateIds = new Set(gatesInPath.map(gate => gate.id));

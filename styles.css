@@ -23,6 +23,7 @@ body {
     overflow: visible;
 }
 
+#gridSvg,
 #trailCanvas {
     position: absolute;
     top: 0;
@@ -30,6 +31,13 @@ body {
     width: 3000px;
     height: 3000px;
     pointer-events: none;
+}
+
+#gridSvg {
+    z-index: 0;
+}
+
+#trailCanvas {
     z-index: 2;
 }
 
@@ -41,16 +49,6 @@ body {
     height: 3000px;
     pointer-events: none;
     z-index: 1;
-}
-
-#gridCanvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 3000px;
-    height: 3000px;
-    pointer-events: none;
-    z-index: 0;
 }
 
 .rocket {

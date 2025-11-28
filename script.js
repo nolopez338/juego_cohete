@@ -138,8 +138,7 @@ const gateXInput = document.getElementById("gateXInput");
 const gateY1Input = document.getElementById("gateY1Input");
 const gateY2Input = document.getElementById("gateY2Input");
 const addGateBtn = document.getElementById("addGateBtn");
-const gridCanvas = document.getElementById("gridCanvas");
-const gridCtx = gridCanvas.getContext("2d");
+const gridSvg = document.getElementById("gridSvg");
 
 const canvas = document.getElementById("trailCanvas");
 const ctx = canvas.getContext("2d");
@@ -147,8 +146,9 @@ const ctx = canvas.getContext("2d");
 const MAP_SIZE = 3000;
 const WORLD_CENTER = MAP_SIZE / 2;
 
-gridCanvas.width = MAP_SIZE;
-gridCanvas.height = MAP_SIZE;
+gridSvg.setAttribute("width", MAP_SIZE);
+gridSvg.setAttribute("height", MAP_SIZE);
+gridSvg.setAttribute("viewBox", `0 0 ${MAP_SIZE} ${MAP_SIZE}`);
 
 gateCanvas.width = MAP_SIZE;
 gateCanvas.height = MAP_SIZE;
@@ -181,12 +181,12 @@ let gatesCrossed = new Set();
 let activeRunGateIds = new Set();
 
 const GRID_ZOOM_STEPS = [
-    { maxPercent: 100, gridSpacing: 200, labelSpacing: 1000 },
-    { maxPercent: 300, gridSpacing: 120, labelSpacing: 600 },
-    { maxPercent: 800, gridSpacing: 60, labelSpacing: 300 },
-    { maxPercent: 1500, gridSpacing: 30, labelSpacing: 150 },
-    { maxPercent: 3000, gridSpacing: 15, labelSpacing: 75 },
-    { maxPercent: Infinity, gridSpacing: 8, labelSpacing: 40 },
+    { maxPercent: 100, gridSpacing: 200 },
+    { maxPercent: 300, gridSpacing: 120 },
+    { maxPercent: 800, gridSpacing: 60 },
+    { maxPercent: 1500, gridSpacing: 30 },
+    { maxPercent: 3000, gridSpacing: 15 },
+    { maxPercent: Infinity, gridSpacing: 8 },
 ];
 
 let currentGridConfig = null;
@@ -806,8 +806,7 @@ function updateGridForZoom() {
     const config = getGridConfigForZoom(zoom);
     if (!config) return;
     const spacingChanged = !currentGridConfig ||
-        config.gridSpacing !== currentGridConfig.gridSpacing ||
-        config.labelSpacing !== currentGridConfig.labelSpacing;
+        config.gridSpacing !== currentGridConfig.gridSpacing;
 
     if (spacingChanged) {
         currentGridConfig = config;
@@ -818,105 +817,118 @@ function updateGridForZoom() {
 function drawGrid(config) {
     const gridSpacing = config.gridSpacing;
     const tickLength = 12;
-    const labelSpacing = config.labelSpacing;
-    const centerX = gridCanvas.width / 2;
-    const centerY = gridCanvas.height / 2;
+    const centerX = MAP_SIZE / 2;
+    const centerY = MAP_SIZE / 2;
 
-    gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+    while (gridSvg.firstChild) gridSvg.removeChild(gridSvg.firstChild);
 
-    gridCtx.strokeStyle = "#2d2d2d";
-    gridCtx.lineWidth = 1;
+    const gridGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    gridGroup.setAttribute("stroke", "#2d2d2d");
+    gridGroup.setAttribute("stroke-width", "1");
+    gridGroup.setAttribute("shape-rendering", "crispEdges");
 
-    for (let x = 0; x <= gridCanvas.width; x += gridSpacing) {
-        gridCtx.beginPath();
-        gridCtx.moveTo(x, 0);
-        gridCtx.lineTo(x, gridCanvas.height);
-        gridCtx.stroke();
+    for (let x = 0; x <= MAP_SIZE; x += gridSpacing) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x);
+        line.setAttribute("y1", 0);
+        line.setAttribute("x2", x);
+        line.setAttribute("y2", MAP_SIZE);
+        gridGroup.appendChild(line);
     }
 
-    for (let y = 0; y <= gridCanvas.height; y += gridSpacing) {
-        gridCtx.beginPath();
-        gridCtx.moveTo(0, y);
-        gridCtx.lineTo(gridCanvas.width, y);
-        gridCtx.stroke();
+    for (let y = 0; y <= MAP_SIZE; y += gridSpacing) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", 0);
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", MAP_SIZE);
+        line.setAttribute("y2", y);
+        gridGroup.appendChild(line);
     }
 
-    gridCtx.strokeStyle = "#555";
-    gridCtx.lineWidth = 2;
+    gridSvg.appendChild(gridGroup);
 
-    gridCtx.beginPath();
-    gridCtx.moveTo(centerX, 0);
-    gridCtx.lineTo(centerX, gridCanvas.height);
-    gridCtx.stroke();
+    const axisGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    axisGroup.setAttribute("stroke", "#555");
+    axisGroup.setAttribute("stroke-width", "2");
+    axisGroup.setAttribute("shape-rendering", "crispEdges");
 
-    gridCtx.beginPath();
-    gridCtx.moveTo(0, centerY);
-    gridCtx.lineTo(gridCanvas.width, centerY);
-    gridCtx.stroke();
+    const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    yAxis.setAttribute("x1", centerX);
+    yAxis.setAttribute("y1", 0);
+    yAxis.setAttribute("x2", centerX);
+    yAxis.setAttribute("y2", MAP_SIZE);
+    axisGroup.appendChild(yAxis);
 
-    gridCtx.strokeStyle = "#777";
-    gridCtx.fillStyle = "#888";
-    gridCtx.font = "12px Arial";
+    const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    xAxis.setAttribute("x1", 0);
+    xAxis.setAttribute("y1", centerY);
+    xAxis.setAttribute("x2", MAP_SIZE);
+    xAxis.setAttribute("y2", centerY);
+    axisGroup.appendChild(xAxis);
 
-    function drawVerticalTick(x) {
-        gridCtx.beginPath();
-        gridCtx.moveTo(x, centerY - tickLength / 2);
-        gridCtx.lineTo(x, centerY + tickLength / 2);
-        gridCtx.stroke();
+    gridSvg.appendChild(axisGroup);
+
+    const tickGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    tickGroup.setAttribute("stroke", "#777");
+    tickGroup.setAttribute("stroke-width", "1.5");
+    tickGroup.setAttribute("shape-rendering", "crispEdges");
+
+    const labelGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    labelGroup.setAttribute("fill", "#b0b0b0");
+    labelGroup.setAttribute("font-size", "12");
+    labelGroup.setAttribute("font-family", "Arial, sans-serif");
+
+    function createLine(x1, y1, x2, y2) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        return line;
     }
 
-    function drawHorizontalTick(y) {
-        gridCtx.beginPath();
-        gridCtx.moveTo(centerX - tickLength / 2, y);
-        gridCtx.lineTo(centerX + tickLength / 2, y);
-        gridCtx.stroke();
+    function createText(x, y, text, anchor = "middle", baseline = "hanging") {
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", x);
+        label.setAttribute("y", y);
+        label.setAttribute("text-anchor", anchor);
+        label.setAttribute("dominant-baseline", baseline);
+        label.textContent = text;
+        return label;
     }
 
-    for (let offset = 0; offset <= gridCanvas.width / 2; offset += gridSpacing) {
+    for (let offset = 0; offset <= MAP_SIZE / 2; offset += gridSpacing) {
         const xPos = centerX + offset;
         const xNeg = centerX - offset;
 
-        if (xPos <= gridCanvas.width) {
-            drawVerticalTick(xPos);
-            if (offset % labelSpacing === 0) {
-                gridCtx.textAlign = "center";
-                gridCtx.textBaseline = "top";
-                gridCtx.fillText(offset, xPos, centerY + tickLength / 2 + 4);
-            }
+        if (xPos <= MAP_SIZE) {
+            tickGroup.appendChild(createLine(xPos, centerY - tickLength / 2, xPos, centerY + tickLength / 2));
+            labelGroup.appendChild(createText(xPos, centerY + tickLength / 2 + 6, offset, "middle", "hanging"));
         }
 
         if (offset !== 0 && xNeg >= 0) {
-            drawVerticalTick(xNeg);
-            if (offset % labelSpacing === 0) {
-                gridCtx.textAlign = "center";
-                gridCtx.textBaseline = "top";
-                gridCtx.fillText(-offset, xNeg, centerY + tickLength / 2 + 4);
-            }
+            tickGroup.appendChild(createLine(xNeg, centerY - tickLength / 2, xNeg, centerY + tickLength / 2));
+            labelGroup.appendChild(createText(xNeg, centerY + tickLength / 2 + 6, -offset, "middle", "hanging"));
         }
     }
 
-    for (let offset = 0; offset <= gridCanvas.height / 2; offset += gridSpacing) {
+    for (let offset = 0; offset <= MAP_SIZE / 2; offset += gridSpacing) {
         const yPos = centerY + offset;
         const yNeg = centerY - offset;
 
-        if (yPos <= gridCanvas.height) {
-            drawHorizontalTick(yPos);
-            if (offset % labelSpacing === 0 && offset !== 0) {
-                gridCtx.textAlign = "right";
-                gridCtx.textBaseline = "middle";
-                gridCtx.fillText(-offset, centerX - tickLength / 2 - 6, yPos);
-            }
+        if (yPos <= MAP_SIZE) {
+            tickGroup.appendChild(createLine(centerX - tickLength / 2, yPos, centerX + tickLength / 2, yPos));
+            labelGroup.appendChild(createText(centerX - tickLength / 2 - 6, yPos, -offset, "end", "middle"));
         }
 
         if (yNeg >= 0) {
-            drawHorizontalTick(yNeg);
-            if (offset % labelSpacing === 0 && offset !== 0) {
-                gridCtx.textAlign = "right";
-                gridCtx.textBaseline = "middle";
-                gridCtx.fillText(offset, centerX - tickLength / 2 - 6, yNeg);
-            }
+            tickGroup.appendChild(createLine(centerX - tickLength / 2, yNeg, centerX + tickLength / 2, yNeg));
+            labelGroup.appendChild(createText(centerX - tickLength / 2 - 6, yNeg, offset, "end", "middle"));
         }
     }
+
+    gridSvg.appendChild(tickGroup);
+    gridSvg.appendChild(labelGroup);
 }
 
 updateGridForZoom();

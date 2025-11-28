@@ -24,7 +24,6 @@ function centerGraphOnRocket() {
 
 // --- MOUSE ZOOM ---
 document.addEventListener("wheel", (e) => {
-    if (frozen) return;
     e.preventDefault();
 
     const zoomStep = 1.1;
@@ -49,7 +48,6 @@ let isPanning = false;
 let startX = 0, startY = 0;
 
 document.addEventListener("mousedown", (e) => {
-    if (frozen) return;
     if (sliderActive) return;
 
     isPanning = true;
@@ -63,7 +61,6 @@ document.addEventListener("mouseup", () => {
 });
 
 document.addEventListener("mousemove", (e) => {
-    if (frozen) return;
     if (!isPanning) return;
 
     translateX = e.clientX - startX;

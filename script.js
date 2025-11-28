@@ -86,6 +86,9 @@ const gateXLabel = document.getElementById("gateXLabel");
 const gateTopLabel = document.getElementById("gateTopLabel");
 const gateBottomLabel = document.getElementById("gateBottomLabel");
 
+const topControlsPanel = document.getElementById("topControls");
+const gateInfoPanel = document.getElementById("gateInfo");
+
 const totalGatesLabel = document.getElementById("totalGatesCount");
 const hitsLabel = document.getElementById("hitsCount");
 const missesLabel = document.getElementById("missCount");
@@ -255,6 +258,86 @@ class ScoreBoard {
 }
 
 const scoreBoard = new ScoreBoard(hitsLabel, missesLabel, totalGatesLabel, hitsDots, missDots);
+
+function makePanelDraggable(panel) {
+    const header = panel.querySelector(".panelHeader");
+    if (!header) return;
+
+    const rect = panel.getBoundingClientRect();
+    panel.style.left = `${rect.left}px`;
+    panel.style.top = `${rect.top}px`;
+    panel.style.transform = "none";
+
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    function startDrag(clientX, clientY) {
+        isDragging = true;
+        offsetX = clientX - panel.offsetLeft;
+        offsetY = clientY - panel.offsetTop;
+        panel.classList.add("dragging");
+    }
+
+    function onPointerMove(e) {
+        if (!isDragging) return;
+        panel.style.left = `${e.clientX - offsetX}px`;
+        panel.style.top = `${e.clientY - offsetY}px`;
+    }
+
+    function endDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        panel.classList.remove("dragging");
+    }
+
+    header.addEventListener("pointerdown", e => {
+        if (e.target.closest(".panelToggle")) return;
+        startDrag(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", endDrag);
+}
+
+function initializeCollapsible(panel) {
+    const body = panel.querySelector(".panelBody");
+    const toggle = panel.querySelector(".panelToggle");
+    if (!body || !toggle) return;
+
+    function setButtonLabel() {
+        toggle.textContent = panel.classList.contains("collapsed") ? "+" : "−";
+    }
+
+    function collapse() {
+        body.style.maxHeight = `${body.scrollHeight}px`;
+        requestAnimationFrame(() => {
+            panel.classList.add("collapsed");
+            body.style.maxHeight = "0px";
+            setButtonLabel();
+        });
+    }
+
+    function expand() {
+        body.style.maxHeight = "0px";
+        panel.classList.remove("collapsed");
+        setButtonLabel();
+        requestAnimationFrame(() => {
+            body.style.maxHeight = `${body.scrollHeight}px`;
+        });
+    }
+
+    toggle.addEventListener("click", () => {
+        if (panel.classList.contains("collapsed")) {
+            expand();
+        } else {
+            collapse();
+        }
+    });
+
+    body.style.maxHeight = `${body.scrollHeight}px`;
+    setButtonLabel();
+}
 
 // UTILS
 function convertCenterToScreen(value) {
@@ -612,6 +695,20 @@ registerSlider(ySlider);
 registerSlider(slopeSlider);
 registerSlider(quadSlider);
 registerSlider(cubicSlider);
+
+makePanelDraggable(topControlsPanel);
+makePanelDraggable(gateInfoPanel);
+initializeCollapsible(topControlsPanel);
+initializeCollapsible(gateInfoPanel);
+
+window.addEventListener("resize", () => {
+    [topControlsPanel, gateInfoPanel].forEach(panel => {
+        if (!panel || panel.classList.contains("collapsed")) return;
+        const body = panel.querySelector(".panelBody");
+        if (!body) return;
+        body.style.maxHeight = `${body.scrollHeight}px`;
+    });
+});
 
 addGateBtn.onclick = () => {
     const x = parseFloat(gateXInput.value);

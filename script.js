@@ -520,6 +520,7 @@ function drawGates() {
         line.setAttribute("y1", gapTop);
         line.setAttribute("x2", x);
         line.setAttribute("y2", gapBottom);
+        line.setAttribute("vector-effect", "non-scaling-stroke");
         lineGroup.appendChild(line);
 
         if (gate.showCoordinates) {

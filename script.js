@@ -1,6 +1,8 @@
 // ====================================================
 // ZOOM + PAN SYSTEM  (MAP ONLY)
 // ====================================================
+const DEFAULT_ROCKET_SIZE = 1;
+
 const zoomContainer = document.getElementById("zoomContainer");
 const gateControlsPanel = document.getElementById("gateControls");
 const gateList = document.getElementById("gateList");
@@ -131,7 +133,7 @@ const sliderDefaults = {
     slope: parseFloat(slopeSlider.defaultValue),
     quad: parseFloat(quadSlider.defaultValue),
     cubic: parseFloat(cubicSlider.defaultValue),
-    rocketSize: parseFloat(rocketSizeSlider.defaultValue),
+    rocketSize: parseFloat(rocketSizeSlider.defaultValue) || DEFAULT_ROCKET_SIZE,
 };
 
 const gateXInput = document.getElementById("gateXInput");
@@ -158,7 +160,7 @@ canvas.width = MAP_SIZE;
 canvas.height = MAP_SIZE;
 
 let rocketX, rocketY;
-let rocketSize = parseFloat(rocketSizeSlider.value) || 1;
+let rocketSize = parseFloat(rocketSizeSlider.value) || DEFAULT_ROCKET_SIZE;
 let slope = 0;
 let quad = 0;
 let cubic = 0;

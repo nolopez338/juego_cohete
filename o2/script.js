@@ -298,7 +298,7 @@ function createTrailPath(stroke, opacity = 1) {
 
 const trailPath = createTrailPath("cyan", 1);
 const trailPathB = createTrailPath("#f472b6", 1);
-const diffTrailPath = createTrailPath("#94a3b8", 0.6);
+const diffTrailPath = createTrailPath("red", 1);
 
 const MAP_SIZE = 3000;
 const WORLD_CENTER = MAP_SIZE / 2;
@@ -812,8 +812,16 @@ function setTrailWidth(value) {
 }
 
 function toggleDifferencePathVisibility() {
-    const visible = differenceToggle ? differenceToggle.checked : true;
-    diffTrailPath.style.display = visible ? "" : "none";
+    const showDifference = differenceToggle ? differenceToggle.checked : true;
+    const diffOpacity = showDifference ? 1 : 0.5;
+    const rocketOpacity = showDifference ? 0.5 : 1;
+
+    [trailPath, trailPathB].forEach(path => {
+        path.setAttribute("stroke-opacity", rocketOpacity);
+    });
+
+    diffTrailPath.setAttribute("stroke-opacity", diffOpacity);
+    diffTrailPath.style.display = "";
 }
 
 function setGateWidth(value) {

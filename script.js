@@ -85,6 +85,12 @@ const gateXLabel = document.getElementById("gateXLabel");
 const gateTopLabel = document.getElementById("gateTopLabel");
 const gateBottomLabel = document.getElementById("gateBottomLabel");
 
+const totalGatesLabel = document.getElementById("totalGatesCount");
+const hitsLabel = document.getElementById("hitsCount");
+const missesLabel = document.getElementById("missCount");
+const hitsDots = document.getElementById("hitsDots");
+const missDots = document.getElementById("missDots");
+
 const ySlider = document.getElementById("ySlider");
 const yInput = document.getElementById("yInput");
 
@@ -137,11 +143,98 @@ let inFlight = false;
 let popupActive = false;
 let roundFinished = false;
 
-let hits = 0;
-let misses = 0;
 let gates = [];
 let gateIdCounter = 1;
 let gatesCrossed = new Set();
+let activeRunGateIds = new Set();
+
+class ScoreBoard {
+    constructor(hitsEl, missesEl, totalEl, hitDotsEl, missDotsEl) {
+        this.hitsEl = hitsEl;
+        this.missesEl = missesEl;
+        this.totalEl = totalEl;
+        this.hitDotsEl = hitDotsEl;
+        this.missDotsEl = missDotsEl;
+
+        this.hits = 0;
+        this.misses = 0;
+        this.runTotal = 0;
+        this.runRemaining = 0;
+        this.runStartMisses = 0;
+
+        this.updateCounts();
+        this.updateRunTotals();
+    }
+
+    resetRun() {
+        this.runTotal = 0;
+        this.runRemaining = 0;
+        this.runStartMisses = this.misses;
+        this.updateRunTotals();
+    }
+
+    startRun(totalGates) {
+        this.runTotal = totalGates;
+        this.runRemaining = totalGates;
+        this.runStartMisses = this.misses;
+        this.updateRunTotals();
+    }
+
+    recordHit() {
+        this.hits++;
+        this.runRemaining = Math.max(0, this.runRemaining - 1);
+        this.updateCounts();
+        this.addDots(this.hitDotsEl, 1, "lime");
+    }
+
+    recordMiss(count = 1) {
+        if (!count) return;
+
+        this.misses += count;
+        this.runRemaining = Math.max(0, this.runRemaining - count);
+        this.updateCounts();
+        this.addDots(this.missDotsEl, count, "red");
+    }
+
+    finalizeRemainingAsMisses() {
+        if (this.runRemaining > 0)
+            this.recordMiss(this.runRemaining);
+    }
+
+    hasRunGates() {
+        return this.runTotal > 0;
+    }
+
+    isRunComplete() {
+        return this.runRemaining <= 0;
+    }
+
+    hadRunMisses() {
+        return this.misses > this.runStartMisses;
+    }
+
+    updateCounts() {
+        this.hitsEl.textContent = this.hits;
+        this.missesEl.textContent = this.misses;
+    }
+
+    updateRunTotals() {
+        this.totalEl.textContent = this.runTotal;
+    }
+
+    addDots(container, count, color) {
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < count; i++) {
+            const dot = document.createElement("span");
+            dot.textContent = "●";
+            dot.style.color = color;
+            fragment.appendChild(dot);
+        }
+        container.appendChild(fragment);
+    }
+}
+
+const scoreBoard = new ScoreBoard(hitsLabel, missesLabel, totalGatesLabel, hitsDots, missDots);
 
 // UTILS
 function convertCenterToScreen(value) {
@@ -311,7 +404,8 @@ function getNextGate() {
 
     const rocketCenterX = rocketX + rocket.clientWidth / 2 - WORLD_CENTER;
     const candidates = gates.filter(gate =>
-        facing === "right" ? gate.x >= rocketCenterX : gate.x <= rocketCenterX
+        !gatesCrossed.has(gate.id) &&
+        (facing === "right" ? gate.x >= rocketCenterX : gate.x <= rocketCenterX)
     );
 
     if (!candidates.length) return null;
@@ -321,6 +415,15 @@ function getNextGate() {
     );
 
     return sorted[0];
+}
+
+function getGatesInFlightPath() {
+    const rocketCenterX = rocketX + rocket.clientWidth / 2 - WORLD_CENTER;
+
+    return gates.filter(gate => facing === "right"
+        ? gate.x >= rocketCenterX
+        : gate.x <= rocketCenterX
+    );
 }
 
 function updateGateInfo() {
@@ -366,6 +469,8 @@ function resetRocket() {
     inFlight = false;
     roundFinished = false;
     gatesCrossed = new Set();
+    activeRunGateIds = new Set();
+    scoreBoard.resetRun();
 
     centerGraphOnRocket();
     updateGateInfo();
@@ -579,7 +684,12 @@ function rotateRocket(dir) {
 function launchRocket() {
     if (inFlight || popupActive) return;
 
+    const gatesInPath = getGatesInFlightPath();
+    activeRunGateIds = new Set(gatesInPath.map(gate => gate.id));
+    scoreBoard.startRun(activeRunGateIds.size);
+
     inFlight = true;
+    roundFinished = false;
     frameCount = 0;
     gatesCrossed = new Set();
 
@@ -609,7 +719,9 @@ function launchRocket() {
         lastTrailY = newY;
 
         checkCollision(prevX, newX, newY);
-        anim = requestAnimationFrame(update);
+
+        if (!roundFinished)
+            anim = requestAnimationFrame(update);
     }
 
     anim = requestAnimationFrame(update);
@@ -626,12 +738,15 @@ function checkCollision(prevX, newX, centerY) {
         rocketY > MAP_SIZE;
 
     if (offMap) {
-        endLaunch(false);
+        scoreBoard.finalizeRemainingAsMisses();
+        endLaunch("Miss!");
         return;
     }
 
+    let gateProcessed = false;
+
     for (const gate of gates) {
-        if (gatesCrossed.has(gate.id)) continue;
+        if (!activeRunGateIds.has(gate.id) || gatesCrossed.has(gate.id)) continue;
 
         const gateX = toScreenX(gate.x);
         const crossed = facing === "right"
@@ -640,35 +755,32 @@ function checkCollision(prevX, newX, centerY) {
 
         if (!crossed) continue;
 
+        gateProcessed = true;
         gatesCrossed.add(gate.id);
 
         const gapTop = Math.min(toScreenY(gate.y1), toScreenY(gate.y2));
         const gapBottom = Math.max(toScreenY(gate.y1), toScreenY(gate.y2));
         const hit = centerY >= gapTop && centerY <= gapBottom;
 
-        endLaunch(hit);
-        return;
+        if (hit) scoreBoard.recordHit();
+        else     scoreBoard.recordMiss();
     }
+
+    if (gateProcessed)
+        updateGateInfo();
+
+    if (scoreBoard.hasRunGates() && scoreBoard.isRunComplete())
+        endLaunch(scoreBoard.hadRunMisses() ? "Miss!" : "Success!");
 }
 
 // END
-function endLaunch(success) {
+function endLaunch(message) {
     cancelAnimationFrame(anim);
     anim = null;
     inFlight = false;
     roundFinished = true;
 
-    if (success) {
-        hits++;
-        document.getElementById("hitsCount").textContent = hits;
-        document.getElementById("hitsDots").innerHTML += "<span style='color:lime;'>●</span>";
-    } else {
-        misses++;
-        document.getElementById("missCount").textContent = misses;
-        document.getElementById("missDots").innerHTML += "<span style='color:red;'>●</span>";
-    }
-
-    showPopup(success ? "Success!" : "Miss!");
+    showPopup(message);
 }
 
 function showPopup(text) {

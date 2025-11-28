@@ -52,6 +52,7 @@ document.addEventListener("wheel", (e) => {
     translateX = pointerX - worldX * zoom;
     translateY = pointerY - worldY * zoom;
 
+    updateGridForZoom();
     applyTransform();
 
 }, { passive: false });
@@ -178,6 +179,17 @@ let gates = [];
 let gateIdCounter = 1;
 let gatesCrossed = new Set();
 let activeRunGateIds = new Set();
+
+const GRID_ZOOM_STEPS = [
+    { maxPercent: 100, gridSpacing: 200, labelSpacing: 1000 },
+    { maxPercent: 300, gridSpacing: 120, labelSpacing: 600 },
+    { maxPercent: 800, gridSpacing: 60, labelSpacing: 300 },
+    { maxPercent: 1500, gridSpacing: 30, labelSpacing: 150 },
+    { maxPercent: 3000, gridSpacing: 15, labelSpacing: 75 },
+    { maxPercent: Infinity, gridSpacing: 8, labelSpacing: 40 },
+];
+
+let currentGridConfig = null;
 
 class ScoreBoard {
     constructor(hitsEl, missesEl, totalEl, hitDotsEl, missDotsEl) {
@@ -781,13 +793,32 @@ function setDefaultView() {
     );
 
     zoom = Math.min(Math.max(targetZoom, 0.2), MAX_ZOOM);
+    updateGridForZoom();
 }
 
 // GRID
-function drawGrid() {
-    const gridSpacing = 100;
+function getGridConfigForZoom(zoomLevel) {
+    const zoomPercent = zoomLevel * 100;
+    return GRID_ZOOM_STEPS.find(step => zoomPercent <= step.maxPercent);
+}
+
+function updateGridForZoom() {
+    const config = getGridConfigForZoom(zoom);
+    if (!config) return;
+    const spacingChanged = !currentGridConfig ||
+        config.gridSpacing !== currentGridConfig.gridSpacing ||
+        config.labelSpacing !== currentGridConfig.labelSpacing;
+
+    if (spacingChanged) {
+        currentGridConfig = config;
+        drawGrid(config);
+    }
+}
+
+function drawGrid(config) {
+    const gridSpacing = config.gridSpacing;
     const tickLength = 12;
-    const labelSpacing = 500;
+    const labelSpacing = config.labelSpacing;
     const centerX = gridCanvas.width / 2;
     const centerY = gridCanvas.height / 2;
 
@@ -888,7 +919,7 @@ function drawGrid() {
     }
 }
 
-drawGrid();
+updateGridForZoom();
 drawGates();
 
 // TRAIL

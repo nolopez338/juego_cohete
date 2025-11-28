@@ -1044,29 +1044,46 @@ function resetGame() {
 function setupRangeLimits({ slider, minInput, maxInput, valueInput, onValueUpdated }) {
     if (!slider || !minInput || !maxInput) return;
 
-    const syncRange = () => {
-        let minVal = parseFloat(minInput.value);
-        let maxVal = parseFloat(maxInput.value);
+    const sliderMin = parseFloat(slider.min);
+    const sliderMax = parseFloat(slider.max);
 
-        minVal = Number.isFinite(minVal) ? minVal : parseFloat(slider.min);
-        maxVal = Number.isFinite(maxVal) ? maxVal : parseFloat(slider.max);
+    const getValidNumber = (rawValue, fallback) => (
+        Number.isFinite(rawValue) ? rawValue : fallback
+    );
 
-        if (minVal > maxVal) {
-            [minVal, maxVal] = [maxVal, minVal];
-            minInput.value = minVal;
-            maxInput.value = maxVal;
+    let lastValidMin = getValidNumber(
+        parseFloat(minInput.value),
+        getValidNumber(sliderMin, 0)
+    );
+    let lastValidMax = getValidNumber(
+        parseFloat(maxInput.value),
+        getValidNumber(sliderMax, 1)
+    );
+
+    const applyRange = (minVal, maxVal) => {
+        let nextMin = minVal;
+        let nextMax = maxVal;
+
+        if (nextMin > nextMax) {
+            [nextMin, nextMax] = [nextMax, nextMin];
         }
 
-        slider.min = minVal;
-        slider.max = maxVal;
+        lastValidMin = nextMin;
+        lastValidMax = nextMax;
+
+        minInput.value = nextMin;
+        maxInput.value = nextMax;
+
+        slider.min = nextMin;
+        slider.max = nextMax;
 
         if (valueInput) {
-            valueInput.min = minVal;
-            valueInput.max = maxVal;
+            valueInput.min = nextMin;
+            valueInput.max = nextMax;
         }
 
-        const clampedValue = clampNumber(parseFloat(slider.value), minVal, maxVal);
-        if (slider.value !== clampedValue) {
+        const clampedValue = clampNumber(parseFloat(slider.value), nextMin, nextMax);
+        if (slider.value !== String(clampedValue)) {
             slider.value = clampedValue;
         }
         if (valueInput && valueInput.value !== String(clampedValue)) {
@@ -1078,10 +1095,29 @@ function setupRangeLimits({ slider, minInput, maxInput, valueInput, onValueUpdat
         }
     };
 
-    minInput.addEventListener("input", syncRange);
-    maxInput.addEventListener("input", syncRange);
+    const commitRangeChanges = () => {
+        const minVal = parseFloat(minInput.value);
+        const maxVal = parseFloat(maxInput.value);
 
-    syncRange();
+        if (!Number.isFinite(minVal) || !Number.isFinite(maxVal)) {
+            minInput.value = lastValidMin;
+            maxInput.value = lastValidMax;
+            return;
+        }
+
+        applyRange(minVal, maxVal);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter") {
+            commitRangeChanges();
+        }
+    };
+
+    minInput.addEventListener("keydown", handleKeyDown);
+    maxInput.addEventListener("keydown", handleKeyDown);
+
+    applyRange(lastValidMin, lastValidMax);
 }
 
 function nextRun() {

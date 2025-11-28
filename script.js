@@ -2,6 +2,8 @@
 // ZOOM + PAN SYSTEM  (MAP ONLY)
 // ====================================================
 const zoomContainer = document.getElementById("zoomContainer");
+const topControls = document.getElementById("topControls");
+const gateControlsPanel = document.getElementById("gateControls");
 let zoom = 1;
 let translateX = 0;
 let translateY = 0;
@@ -72,12 +74,57 @@ document.addEventListener("mousemove", (e) => {
     applyTransform();
 });
 
+function makePanelDraggable(panel) {
+    if (!panel) return;
+
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+    const interactiveSelector = "input, button, select, textarea, option";
+
+    panel.addEventListener("pointerdown", (e) => {
+        if (e.button !== undefined && e.button !== 0) return;
+        if (e.target.closest(interactiveSelector)) return;
+
+        const rect = panel.getBoundingClientRect();
+        panel.style.left = `${rect.left}px`;
+        panel.style.top = `${rect.top}px`;
+        panel.style.transform = "none";
+
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        dragging = true;
+        sliderActive = true;
+
+        panel.setPointerCapture(e.pointerId);
+    });
+
+    panel.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        e.preventDefault();
+        panel.style.left = `${e.clientX - offsetX}px`;
+        panel.style.top = `${e.clientY - offsetY}px`;
+    });
+
+    const stopDrag = (e) => {
+        if (!dragging) return;
+        dragging = false;
+        sliderActive = false;
+        if (panel.hasPointerCapture(e.pointerId)) {
+            panel.releasePointerCapture(e.pointerId);
+        }
+    };
+
+    panel.addEventListener("pointerup", stopDrag);
+    panel.addEventListener("pointercancel", stopDrag);
+}
+
+makePanelDraggable(topControls);
+makePanelDraggable(gateControlsPanel);
+
 // ====================================================
 // GAME LOGIC  (unchanged from previous version)
 // ====================================================
-
-const rocket = document.getElementById("rocket");
-const gameArea = document.getElementById("gameArea");
 
 const gateCanvas = document.getElementById("gateCanvas");
 const gateCtx = gateCanvas.getContext("2d");

@@ -200,3 +200,17 @@ body {
     min-width: 220px;
 }
 
+.draggablePanel {
+    cursor: move;
+    user-select: none;
+    z-index: 40;
+}
+
+.draggablePanel input,
+.draggablePanel button,
+.draggablePanel select,
+.draggablePanel textarea {
+    cursor: auto;
+    user-select: auto;
+}
+

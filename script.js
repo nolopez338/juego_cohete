@@ -135,6 +135,10 @@ const trailWidthLabel = document.getElementById("trailWidthLabel");
 const trailWidthSlider = document.getElementById("trailWidthSlider");
 const trailWidthSetBtn = document.getElementById("trailWidthSetBtn");
 
+const gateWidthLabel = document.getElementById("gateWidthLabel");
+const gateWidthSlider = document.getElementById("gateWidthSlider");
+const gateWidthSetBtn = document.getElementById("gateWidthSetBtn");
+
 const resetBtn = document.getElementById("resetBtn");
 const restartBtn = document.getElementById("restartBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -146,6 +150,7 @@ const sliderDefaults = {
     cubic: parseFloat(cubicSlider.defaultValue),
     rocketSize: parseFloat(rocketSizeSlider.defaultValue) || DEFAULT_ROCKET_SIZE,
     trailWidth: parseFloat(trailWidthSlider?.defaultValue) || 3,
+    gateWidth: parseFloat(gateWidthSlider?.defaultValue) || 3,
 };
 
 function clampNumber(value, min, max) {
@@ -237,6 +242,8 @@ let rocketSize = parseFloat(rocketSizeSlider.value) || DEFAULT_ROCKET_SIZE;
 let rocketSizeLocked = false;
 let trailWidthLocked = false;
 let trailStrokeWidth = parseFloat(trailWidthSlider?.value) || 3;
+let gateWidthLocked = false;
+let gateBaseStrokeWidth = parseFloat(gateWidthSlider?.value) || sliderDefaults.gateWidth;
 let slope = 0;
 let quad = 0;
 let cubic = 0;
@@ -246,6 +253,7 @@ let rocketAngle = 90;
 
 setRocketSize(rocketSize, false);
 setTrailWidth(trailStrokeWidth);
+setGateWidth(gateBaseStrokeWidth);
 updateRocketSizeControls();
 updateRocketTransform();
 
@@ -551,8 +559,6 @@ function setRocketSize(value, maintainCenter = true) {
     updateRocketSize(maintainCenter);
 }
 
-const GATE_BASE_STROKE_WIDTH = 3;
-
 function setTrailWidth(value) {
     const min = parseFloat(trailWidthSlider?.min) || 1;
     const max = parseFloat(trailWidthSlider?.max) || 10;
@@ -562,6 +568,17 @@ function setTrailWidth(value) {
         trailWidthSlider.value = clamped;
     }
     trailPath.setAttribute("stroke-width", clamped);
+}
+
+function setGateWidth(value) {
+    const min = parseFloat(gateWidthSlider?.min) || 1;
+    const max = parseFloat(gateWidthSlider?.max) || 10;
+    const clamped = clampNumber(value, min, max);
+    gateBaseStrokeWidth = clamped;
+    if (gateWidthSlider) {
+        gateWidthSlider.value = clamped;
+    }
+    updateGateStrokesForZoom();
 }
 
 // GATES
@@ -801,6 +818,7 @@ function resetSlidersToDefaults() {
 
     setTrailWidth(sliderDefaults.trailWidth);
     setRocketSize(sliderDefaults.rocketSize);
+    setGateWidth(sliderDefaults.gateWidth);
 }
 
 // RESET
@@ -1019,6 +1037,21 @@ if (trailWidthSetBtn) {
     };
 }
 
+if (gateWidthSlider) {
+    gateWidthSlider.oninput = () => {
+        setGateWidth(parseFloat(gateWidthSlider.value));
+    };
+}
+
+if (gateWidthSetBtn) {
+    gateWidthSetBtn.onclick = () => {
+        gateWidthLocked = true;
+        if (gateWidthLabel) gateWidthLabel.remove();
+        if (gateWidthSlider) gateWidthSlider.remove();
+        gateWidthSetBtn.remove();
+    };
+}
+
 function registerSlider(slider) {
     if (!slider) return;
 
@@ -1037,6 +1070,7 @@ registerSlider(quadSlider);
 registerSlider(cubicSlider);
 registerSlider(rocketSizeSlider);
 registerSlider(trailWidthSlider);
+registerSlider(gateWidthSlider);
 
 function renderSavedLevelButtons() {
     if (!savedLevelsList) return;
@@ -1162,7 +1196,7 @@ function updateGateStrokesForZoom() {
 }
 
 function getGateStrokeWidthForZoom(zoomLevel) {
-    return GATE_BASE_STROKE_WIDTH / zoomLevel;
+    return gateBaseStrokeWidth / zoomLevel;
 }
 
 function drawGrid(config, labelFontSize) {

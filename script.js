@@ -132,6 +132,10 @@ const rocketSizeSlider = document.getElementById("rocketSizeSlider");
 const rocketSizeInput = document.getElementById("rocketSizeInput");
 const rocketSizeSetBtn = document.getElementById("rocketSizeSetBtn");
 
+const trailWidthLabel = document.getElementById("trailWidthLabel");
+const trailWidthSlider = document.getElementById("trailWidthSlider");
+const trailWidthSetBtn = document.getElementById("trailWidthSetBtn");
+
 const resetBtn = document.getElementById("resetBtn");
 const restartBtn = document.getElementById("restartBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -142,6 +146,7 @@ const sliderDefaults = {
     quad: parseFloat(quadSlider.defaultValue),
     cubic: parseFloat(cubicSlider.defaultValue),
     rocketSize: parseFloat(rocketSizeSlider.defaultValue) || DEFAULT_ROCKET_SIZE,
+    trailWidth: parseFloat(trailWidthSlider?.defaultValue) || 3,
 };
 
 function clampNumber(value, min, max) {
@@ -208,7 +213,6 @@ const trailSvg = document.getElementById("trailSvg");
 const trailPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
 trailPath.setAttribute("fill", "none");
 trailPath.setAttribute("stroke", "cyan");
-trailPath.setAttribute("stroke-width", "3");
 trailPath.setAttribute("vector-effect", "non-scaling-stroke");
 trailPath.setAttribute("stroke-linecap", "round");
 trailPath.setAttribute("stroke-linejoin", "round");
@@ -232,6 +236,8 @@ trailSvg.setAttribute("viewBox", `0 0 ${MAP_SIZE} ${MAP_SIZE}`);
 let rocketX, rocketY;
 let rocketSize = parseFloat(rocketSizeSlider.value) || DEFAULT_ROCKET_SIZE;
 let rocketSizeLocked = false;
+let trailWidthLocked = false;
+let trailStrokeWidth = parseFloat(trailWidthSlider?.value) || 3;
 let slope = 0;
 let quad = 0;
 let cubic = 0;
@@ -240,6 +246,7 @@ let facing = "right";
 let rocketAngle = 90;
 
 setRocketSize(rocketSize, false);
+setTrailWidth(trailStrokeWidth);
 updateRocketSizeControls();
 updateRocketTransform();
 
@@ -550,6 +557,17 @@ function setRocketSize(value, maintainCenter = true) {
 
 const GATE_BASE_STROKE_WIDTH = 3;
 
+function setTrailWidth(value) {
+    const min = parseFloat(trailWidthSlider?.min) || 1;
+    const max = parseFloat(trailWidthSlider?.max) || 10;
+    const clamped = clampNumber(value, min, max);
+    trailStrokeWidth = clamped;
+    if (trailWidthSlider) {
+        trailWidthSlider.value = clamped;
+    }
+    trailPath.setAttribute("stroke-width", clamped);
+}
+
 // GATES
 function drawGates() {
     while (gateSvg.firstChild) gateSvg.removeChild(gateSvg.firstChild);
@@ -785,6 +803,7 @@ function resetSlidersToDefaults() {
     handleQuadChange(sliderDefaults.quad);
     handleCubicChange(sliderDefaults.cubic);
 
+    setTrailWidth(sliderDefaults.trailWidth);
     setRocketSize(sliderDefaults.rocketSize);
 }
 
@@ -994,7 +1013,24 @@ rocketSizeSetBtn.onclick = () => {
     updateRocketSizeControls();
 };
 
+if (trailWidthSlider) {
+    trailWidthSlider.oninput = () => {
+        setTrailWidth(parseFloat(trailWidthSlider.value));
+    };
+}
+
+if (trailWidthSetBtn) {
+    trailWidthSetBtn.onclick = () => {
+        trailWidthLocked = true;
+        if (trailWidthLabel) trailWidthLabel.remove();
+        if (trailWidthSlider) trailWidthSlider.remove();
+        trailWidthSetBtn.remove();
+    };
+}
+
 function registerSlider(slider) {
+    if (!slider) return;
+
     ["mousedown", "touchstart"].forEach(evt => {
         slider.addEventListener(evt, () => sliderActive = true);
     });
@@ -1009,6 +1045,7 @@ registerSlider(slopeSlider);
 registerSlider(quadSlider);
 registerSlider(cubicSlider);
 registerSlider(rocketSizeSlider);
+registerSlider(trailWidthSlider);
 
 function renderSavedLevelButtons() {
     if (!savedLevelsList) return;

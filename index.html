@@ -10,38 +10,59 @@
 <body>
 
 <!-- UI stays normal size -->
-<div id="topControls" class="panel">
-    <div class="panelHeader">
-        <span>Sliders</span>
-        <button class="panelToggle" data-target="topControls" aria-label="Toggle slider panel">−</button>
+<div id="topPanelRow">
+    <div id="topControls" class="panel">
+        <div class="panelHeader">
+            <span>Sliders</span>
+            <button class="panelToggle" data-target="topControls" aria-label="Toggle slider panel">−</button>
+        </div>
+        <div class="panelBody">
+            <div class="controlRow">
+                <span>Y pos</span>
+                <input type="range" id="ySlider" min="-100" max="100" value="0">
+                <input type="number" id="yInput" class="numInput" min="-100" max="100" value="0">
+            </div>
+
+            <div class="controlRow">
+                <span>Slope</span>
+                <input type="range" id="slopeSlider" min="-10" max="10" step="0.1" value="0">
+                <input type="number" id="slopeInput" class="numInput" min="-10" max="10" step="0.1" value="0">
+            </div>
+
+            <div class="controlRow">
+                <span>Quad</span>
+                <input type="range" id="quadSlider" min="-1" max="1" step="0.01" value="0">
+                <input type="number" id="quadInput" class="numInput" min="-1" max="1" step="0.01" value="0">
+            </div>
+
+            <div class="controlRow">
+                <span>Cubic</span>
+                <input type="range" id="cubicSlider" min="-0.01" max="0.01" step="0.0001" value="0">
+                <input type="number" id="cubicInput" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
+            </div>
+
+            <div class="controlRow">
+                <button id="resetBtn" class="secondaryBtn">Reset</button>
+            </div>
+        </div>
     </div>
-    <div class="panelBody">
-        <div class="controlRow">
-            <span>Y pos</span>
-            <input type="range" id="ySlider" min="-100" max="100" value="0">
-            <input type="number" id="yInput" class="numInput" min="-100" max="100" value="0">
-        </div>
 
-        <div class="controlRow">
-            <span>Slope</span>
-            <input type="range" id="slopeSlider" min="-10" max="10" step="0.1" value="0">
-            <input type="number" id="slopeInput" class="numInput" min="-10" max="10" step="0.1" value="0">
+    <div id="gateControls" class="panel">
+        <div class="panelHeader">
+            <span>Gates</span>
+            <button class="panelToggle" data-target="gateControls" aria-label="Toggle gate controls panel">−</button>
         </div>
-
-        <div class="controlRow">
-            <span>Quad</span>
-            <input type="range" id="quadSlider" min="-1" max="1" step="0.01" value="0">
-            <input type="number" id="quadInput" class="numInput" min="-1" max="1" step="0.01" value="0">
-        </div>
-
-        <div class="controlRow">
-            <span>Cubic</span>
-            <input type="range" id="cubicSlider" min="-0.01" max="0.01" step="0.0001" value="0">
-            <input type="number" id="cubicInput" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
-        </div>
-
-        <div class="controlRow">
-            <button id="resetBtn" class="secondaryBtn">Reset</button>
+        <div class="panelBody">
+            <div class="controlRow">
+                <span>X</span>
+                <input type="number" id="gateXInput" class="numInput" value="0" step="50">
+                <span>Y1</span>
+                <input type="number" id="gateY1Input" class="numInput" value="-200" step="50">
+                <span>Y2</span>
+                <input type="number" id="gateY2Input" class="numInput" value="200" step="50">
+                <button id="addGateBtn">Add Gate</button>
+            </div>
+            <div id="gateList"></div>
         </div>
     </div>
 </div>
@@ -70,19 +91,6 @@
         <span style="color:red;">Misses:</span> <span id="missCount">0</span>
     </div>
     <div id="missDots"></div>
-</div>
-
-<div id="gateControls">
-    <div class="controlRow">
-        <span>X</span>
-        <input type="number" id="gateXInput" class="numInput" value="0" step="50">
-        <span>Y1</span>
-        <input type="number" id="gateY1Input" class="numInput" value="-200" step="50">
-        <span>Y2</span>
-        <input type="number" id="gateY2Input" class="numInput" value="200" step="50">
-        <button id="addGateBtn">Add Gate</button>
-    </div>
-    <div id="gateList"></div>
 </div>
 
 <!-- MAP ONLY (zoom + pan) -->

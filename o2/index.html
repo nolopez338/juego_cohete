@@ -10,159 +10,166 @@
 <body>
 
 <!-- UI stays normal size -->
-<div id="topPanelRow">
-    <div id="topControls" class="panel">
-        <div class="panelHeader">
-            <span>Rocket 1 Sliders</span>
-            <button class="panelToggle" data-target="topControls" aria-label="Toggle slider panel">−</button>
-        </div>
-        <div class="panelBody">
-            <div class="controlRow">
-                <span>Y pos</span>
-                <input type="number" id="yMinInput" class="rangeLimitInput" value="-100" step="1">
-                <input type="range" id="ySlider" min="-100" max="100" value="0">
-                <input type="number" id="yInput" class="numInput" min="-100" max="100" value="0">
-                <input type="number" id="yMaxInput" class="rangeLimitInput" value="100" step="1">
-            </div>
-
-            <div class="controlRow">
-                <span>Slope</span>
-                <input type="number" id="slopeMinInput" class="rangeLimitInput" value="-10" step="0.1">
-                <input type="range" id="slopeSlider" min="-10" max="10" step="0.1" value="0">
-                <input type="number" id="slopeInput" class="numInput" min="-10" max="10" step="0.1" value="0">
-                <input type="number" id="slopeMaxInput" class="rangeLimitInput" value="10" step="0.1">
-            </div>
-
-            <div class="controlRow">
-                <span>Quad</span>
-                <input type="number" id="quadMinInput" class="rangeLimitInput" value="-1" step="0.01">
-                <input type="range" id="quadSlider" min="-1" max="1" step="0.01" value="0">
-                <input type="number" id="quadInput" class="numInput" min="-1" max="1" step="0.01" value="0">
-                <input type="number" id="quadMaxInput" class="rangeLimitInput" value="1" step="0.01">
-            </div>
-
-            <div class="controlRow">
-                <span>Cubic</span>
-                <input type="number" id="cubicMinInput" class="rangeLimitInput" value="-0.01" step="0.0001">
-                <input type="range" id="cubicSlider" min="-0.01" max="0.01" step="0.0001" value="0">
-                <input type="number" id="cubicInput" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
-                <input type="number" id="cubicMaxInput" class="rangeLimitInput" value="0.01" step="0.0001">
-            </div>
-        </div>
+<div id="superMenu" class="supermenu">
+    <div class="superMenuHeader">
+        <span class="superMenuTitle">Menu</span>
+        <button id="superMenuToggle" class="panelToggle" aria-label="Toggle menu" aria-expanded="true">‹</button>
     </div>
 
-    <div id="topControlsB" class="panel">
-        <div class="panelHeader">
-            <span>Rocket 2 Sliders</span>
-            <button class="panelToggle" data-target="topControlsB" aria-label="Toggle slider panel">−</button>
-        </div>
-        <div class="panelBody">
-            <div class="controlRow">
-                <span>Y pos</span>
-                <input type="number" id="yMinInputB" class="rangeLimitInput" value="-100" step="1">
-                <input type="range" id="ySliderB" min="-100" max="100" value="0">
-                <input type="number" id="yInputB" class="numInput" min="-100" max="100" value="0">
-                <input type="number" id="yMaxInputB" class="rangeLimitInput" value="100" step="1">
+    <div id="topPanelRow">
+        <div id="topControls" class="panel">
+            <div class="panelHeader">
+                <span>Rocket 1 Sliders</span>
+                <button class="panelToggle" data-target="topControls" aria-label="Toggle slider panel">−</button>
             </div>
+            <div class="panelBody">
+                <div class="controlRow">
+                    <span>Y pos</span>
+                    <input type="number" id="yMinInput" class="rangeLimitInput" value="-100" step="1">
+                    <input type="range" id="ySlider" min="-100" max="100" value="0">
+                    <input type="number" id="yInput" class="numInput" min="-100" max="100" value="0">
+                    <input type="number" id="yMaxInput" class="rangeLimitInput" value="100" step="1">
+                </div>
 
-            <div class="controlRow">
-                <span>Slope</span>
-                <input type="number" id="slopeMinInputB" class="rangeLimitInput" value="-10" step="0.1">
-                <input type="range" id="slopeSliderB" min="-10" max="10" step="0.1" value="0">
-                <input type="number" id="slopeInputB" class="numInput" min="-10" max="10" step="0.1" value="0">
-                <input type="number" id="slopeMaxInputB" class="rangeLimitInput" value="10" step="0.1">
-            </div>
+                <div class="controlRow">
+                    <span>Slope</span>
+                    <input type="number" id="slopeMinInput" class="rangeLimitInput" value="-10" step="0.1">
+                    <input type="range" id="slopeSlider" min="-10" max="10" step="0.1" value="0">
+                    <input type="number" id="slopeInput" class="numInput" min="-10" max="10" step="0.1" value="0">
+                    <input type="number" id="slopeMaxInput" class="rangeLimitInput" value="10" step="0.1">
+                </div>
 
-            <div class="controlRow">
-                <span>Quad</span>
-                <input type="number" id="quadMinInputB" class="rangeLimitInput" value="-1" step="0.01">
-                <input type="range" id="quadSliderB" min="-1" max="1" step="0.01" value="0">
-                <input type="number" id="quadInputB" class="numInput" min="-1" max="1" step="0.01" value="0">
-                <input type="number" id="quadMaxInputB" class="rangeLimitInput" value="1" step="0.01">
-            </div>
+                <div class="controlRow">
+                    <span>Quad</span>
+                    <input type="number" id="quadMinInput" class="rangeLimitInput" value="-1" step="0.01">
+                    <input type="range" id="quadSlider" min="-1" max="1" step="0.01" value="0">
+                    <input type="number" id="quadInput" class="numInput" min="-1" max="1" step="0.01" value="0">
+                    <input type="number" id="quadMaxInput" class="rangeLimitInput" value="1" step="0.01">
+                </div>
 
-            <div class="controlRow">
-                <span>Cubic</span>
-                <input type="number" id="cubicMinInputB" class="rangeLimitInput" value="-0.01" step="0.0001">
-                <input type="range" id="cubicSliderB" min="-0.01" max="0.01" step="0.0001" value="0">
-                <input type="number" id="cubicInputB" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
-                <input type="number" id="cubicMaxInputB" class="rangeLimitInput" value="0.01" step="0.0001">
-            </div>
-        </div>
-    </div>
-
-    <div id="generalConfigPanel" class="panel">
-        <div class="panelHeader">
-            <span>General Configuration</span>
-            <button class="panelToggle" data-target="generalConfigPanel" aria-label="Toggle general configuration panel">−</button>
-        </div>
-        <div class="panelBody">
-            <div class="controlRow">
-                <span id="differenceToggleLabel">Show Difference Path</span>
-                <label class="toggleLabel">
-                    <input type="checkbox" id="differenceToggle" checked>
-                    <span>Toggle</span>
-                </label>
-            </div>
-
-            <div class="controlRow">
-                <span id="rocketSizeLabel">Rocket Size</span>
-                <input type="range" id="rocketSizeSlider" min="0.5" max="2" step="0.05" value="1">
-                <button id="rocketSizeSetBtn" class="secondaryBtn">Set</button>
-            </div>
-
-            <div class="controlRow">
-                <span id="trailWidthLabel">Trajectory Width</span>
-                <input type="range" id="trailWidthSlider" min="1" max="10" step="0.5" value="3">
-                <button id="trailWidthSetBtn" class="secondaryBtn">Set</button>
-            </div>
-
-            <div class="controlRow">
-                <span id="gateWidthLabel">Gate Width</span>
-                <input type="range" id="gateWidthSlider" min="1" max="10" step="0.5" value="3">
-                <button id="gateWidthSetBtn" class="secondaryBtn">Set</button>
-            </div>
-
-            <div class="controlRow">
-                <span id="axisWidthLabel">XY-Axis Width</span>
-                <input type="range" id="axisWidthSlider" min="0.5" max="6" step="0.1" value="2">
-                <button id="axisWidthSetBtn" class="secondaryBtn">Set</button>
-            </div>
-
-            <div class="controlRow">
-                <button id="resetBtn" class="secondaryBtn">Reset</button>
-                <button id="restartBtn" class="secondaryBtn">Restart</button>
-                <button id="nextBtn" class="secondaryBtn">Next</button>
+                <div class="controlRow">
+                    <span>Cubic</span>
+                    <input type="number" id="cubicMinInput" class="rangeLimitInput" value="-0.01" step="0.0001">
+                    <input type="range" id="cubicSlider" min="-0.01" max="0.01" step="0.0001" value="0">
+                    <input type="number" id="cubicInput" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
+                    <input type="number" id="cubicMaxInput" class="rangeLimitInput" value="0.01" step="0.0001">
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="gateControls" class="panel">
-        <div class="panelHeader">
-            <span>Gates</span>
-            <button class="panelToggle" data-target="gateControls" aria-label="Toggle gate controls panel">−</button>
-        </div>
-        <div class="panelBody">
-            <div class="controlRow">
-                <span>X</span>
-                <input type="number" id="gateXInput" class="numInput" value="0" step="50">
-                <span>Y1</span>
-                <input type="number" id="gateY1Input" class="numInput" value="-200" step="50">
-                <span>Y2</span>
-                <input type="number" id="gateY2Input" class="numInput" value="200" step="50">
-                <button id="addGateBtn">Add Gate</button>
+        <div id="topControlsB" class="panel">
+            <div class="panelHeader">
+                <span>Rocket 2 Sliders</span>
+                <button class="panelToggle" data-target="topControlsB" aria-label="Toggle slider panel">−</button>
             </div>
-            <div id="gateList"></div>
-        </div>
-    </div>
+            <div class="panelBody">
+                <div class="controlRow">
+                    <span>Y pos</span>
+                    <input type="number" id="yMinInputB" class="rangeLimitInput" value="-100" step="1">
+                    <input type="range" id="ySliderB" min="-100" max="100" value="0">
+                    <input type="number" id="yInputB" class="numInput" min="-100" max="100" value="0">
+                    <input type="number" id="yMaxInputB" class="rangeLimitInput" value="100" step="1">
+                </div>
 
-    <div id="savedLevelsPanel" class="panel">
-        <div class="panelHeader">
-            <span>Saved Levels</span>
-            <button class="panelToggle" data-target="savedLevelsPanel" aria-label="Toggle saved levels panel">−</button>
+                <div class="controlRow">
+                    <span>Slope</span>
+                    <input type="number" id="slopeMinInputB" class="rangeLimitInput" value="-10" step="0.1">
+                    <input type="range" id="slopeSliderB" min="-10" max="10" step="0.1" value="0">
+                    <input type="number" id="slopeInputB" class="numInput" min="-10" max="10" step="0.1" value="0">
+                    <input type="number" id="slopeMaxInputB" class="rangeLimitInput" value="10" step="0.1">
+                </div>
+
+                <div class="controlRow">
+                    <span>Quad</span>
+                    <input type="number" id="quadMinInputB" class="rangeLimitInput" value="-1" step="0.01">
+                    <input type="range" id="quadSliderB" min="-1" max="1" step="0.01" value="0">
+                    <input type="number" id="quadInputB" class="numInput" min="-1" max="1" step="0.01" value="0">
+                    <input type="number" id="quadMaxInputB" class="rangeLimitInput" value="1" step="0.01">
+                </div>
+
+                <div class="controlRow">
+                    <span>Cubic</span>
+                    <input type="number" id="cubicMinInputB" class="rangeLimitInput" value="-0.01" step="0.0001">
+                    <input type="range" id="cubicSliderB" min="-0.01" max="0.01" step="0.0001" value="0">
+                    <input type="number" id="cubicInputB" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
+                    <input type="number" id="cubicMaxInputB" class="rangeLimitInput" value="0.01" step="0.0001">
+                </div>
+            </div>
         </div>
-        <div class="panelBody">
-            <div id="savedLevelsList" class="savedLevelButtons"></div>
+
+        <div id="generalConfigPanel" class="panel">
+            <div class="panelHeader">
+                <span>General Configuration</span>
+                <button class="panelToggle" data-target="generalConfigPanel" aria-label="Toggle general configuration panel">−</button>
+            </div>
+            <div class="panelBody">
+                <div class="controlRow">
+                    <span id="differenceToggleLabel">Show Difference Path</span>
+                    <label class="toggleLabel">
+                        <input type="checkbox" id="differenceToggle" checked>
+                        <span>Toggle</span>
+                    </label>
+                </div>
+
+                <div class="controlRow">
+                    <span id="rocketSizeLabel">Rocket Size</span>
+                    <input type="range" id="rocketSizeSlider" min="0.5" max="2" step="0.05" value="1">
+                    <button id="rocketSizeSetBtn" class="secondaryBtn">Set</button>
+                </div>
+
+                <div class="controlRow">
+                    <span id="trailWidthLabel">Trajectory Width</span>
+                    <input type="range" id="trailWidthSlider" min="1" max="10" step="0.5" value="3">
+                    <button id="trailWidthSetBtn" class="secondaryBtn">Set</button>
+                </div>
+
+                <div class="controlRow">
+                    <span id="gateWidthLabel">Gate Width</span>
+                    <input type="range" id="gateWidthSlider" min="1" max="10" step="0.5" value="3">
+                    <button id="gateWidthSetBtn" class="secondaryBtn">Set</button>
+                </div>
+
+                <div class="controlRow">
+                    <span id="axisWidthLabel">XY-Axis Width</span>
+                    <input type="range" id="axisWidthSlider" min="0.5" max="6" step="0.1" value="2">
+                    <button id="axisWidthSetBtn" class="secondaryBtn">Set</button>
+                </div>
+
+                <div class="controlRow">
+                    <button id="resetBtn" class="secondaryBtn">Reset</button>
+                    <button id="restartBtn" class="secondaryBtn">Restart</button>
+                    <button id="nextBtn" class="secondaryBtn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="gateControls" class="panel">
+            <div class="panelHeader">
+                <span>Gates</span>
+                <button class="panelToggle" data-target="gateControls" aria-label="Toggle gate controls panel">−</button>
+            </div>
+            <div class="panelBody">
+                <div class="controlRow">
+                    <span>X</span>
+                    <input type="number" id="gateXInput" class="numInput" value="0" step="50">
+                    <span>Y1</span>
+                    <input type="number" id="gateY1Input" class="numInput" value="-200" step="50">
+                    <span>Y2</span>
+                    <input type="number" id="gateY2Input" class="numInput" value="200" step="50">
+                    <button id="addGateBtn">Add Gate</button>
+                </div>
+                <div id="gateList"></div>
+            </div>
+        </div>
+
+        <div id="savedLevelsPanel" class="panel">
+            <div class="panelHeader">
+                <span>Saved Levels</span>
+                <button class="panelToggle" data-target="savedLevelsPanel" aria-label="Toggle saved levels panel">−</button>
+            </div>
+            <div class="panelBody">
+                <div id="savedLevelsList" class="savedLevelButtons"></div>
+            </div>
         </div>
     </div>
 </div>

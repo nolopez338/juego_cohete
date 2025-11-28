@@ -35,6 +35,14 @@ function centerGraphOnRocket() {
 
 // --- MOUSE ZOOM ---
 document.addEventListener("wheel", (e) => {
+    const isOverSuperMenu = superMenu?.contains(e.target) &&
+        !superMenu.classList.contains("collapsed");
+    if (isOverSuperMenu) {
+        e.preventDefault();
+        superMenu.scrollTop += e.deltaY;
+        return;
+    }
+
     const isOverGatePanel = gateControlsPanel.contains(e.target);
     if (isOverGatePanel) {
         e.preventDefault();

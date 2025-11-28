@@ -139,6 +139,10 @@ const gateWidthLabel = document.getElementById("gateWidthLabel");
 const gateWidthSlider = document.getElementById("gateWidthSlider");
 const gateWidthSetBtn = document.getElementById("gateWidthSetBtn");
 
+const axisWidthLabel = document.getElementById("axisWidthLabel");
+const axisWidthSlider = document.getElementById("axisWidthSlider");
+const axisWidthSetBtn = document.getElementById("axisWidthSetBtn");
+
 const resetBtn = document.getElementById("resetBtn");
 const restartBtn = document.getElementById("restartBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -151,6 +155,7 @@ const sliderDefaults = {
     rocketSize: parseFloat(rocketSizeSlider.defaultValue) || DEFAULT_ROCKET_SIZE,
     trailWidth: parseFloat(trailWidthSlider?.defaultValue) || 3,
     gateWidth: parseFloat(gateWidthSlider?.defaultValue) || 3,
+    axisWidth: parseFloat(axisWidthSlider?.defaultValue) || 2,
 };
 
 function clampNumber(value, min, max) {
@@ -244,6 +249,8 @@ let trailWidthLocked = false;
 let trailStrokeWidth = parseFloat(trailWidthSlider?.value) || 3;
 let gateWidthLocked = false;
 let gateBaseStrokeWidth = parseFloat(gateWidthSlider?.value) || sliderDefaults.gateWidth;
+let axisWidthLocked = false;
+let axisStrokeWidth = parseFloat(axisWidthSlider?.value) || sliderDefaults.axisWidth;
 let slope = 0;
 let quad = 0;
 let cubic = 0;
@@ -254,6 +261,7 @@ let rocketAngle = 90;
 setRocketSize(rocketSize, false);
 setTrailWidth(trailStrokeWidth);
 setGateWidth(gateBaseStrokeWidth);
+setAxisWidth(axisStrokeWidth);
 updateRocketSizeControls();
 updateRocketTransform();
 
@@ -581,6 +589,32 @@ function setGateWidth(value) {
     updateGateStrokesForZoom();
 }
 
+function getTickStrokeWidth() {
+    return Math.max(axisStrokeWidth * 0.75, 0.5);
+}
+
+function setAxisWidth(value) {
+    const min = parseFloat(axisWidthSlider?.min) || 0.5;
+    const max = parseFloat(axisWidthSlider?.max) || 6;
+    const clamped = clampNumber(value, min, max);
+    axisStrokeWidth = clamped;
+    if (axisWidthSlider) {
+        axisWidthSlider.value = clamped;
+    }
+    updateAxisStrokeStyles();
+}
+
+function updateAxisStrokeStyles() {
+    const axisGroup = gridSvg.querySelector('[data-role="grid-axes"]');
+    const tickGroup = gridSvg.querySelector('[data-role="grid-ticks"]');
+    if (axisGroup) {
+        axisGroup.setAttribute("stroke-width", axisStrokeWidth);
+    }
+    if (tickGroup) {
+        tickGroup.setAttribute("stroke-width", getTickStrokeWidth());
+    }
+}
+
 // GATES
 function drawGates() {
     while (gateSvg.firstChild) gateSvg.removeChild(gateSvg.firstChild);
@@ -819,6 +853,7 @@ function resetSlidersToDefaults() {
     setTrailWidth(sliderDefaults.trailWidth);
     setRocketSize(sliderDefaults.rocketSize);
     setGateWidth(sliderDefaults.gateWidth);
+    setAxisWidth(sliderDefaults.axisWidth);
 }
 
 // RESET
@@ -1052,6 +1087,21 @@ if (gateWidthSetBtn) {
     };
 }
 
+if (axisWidthSlider) {
+    axisWidthSlider.oninput = () => {
+        setAxisWidth(parseFloat(axisWidthSlider.value));
+    };
+}
+
+if (axisWidthSetBtn) {
+    axisWidthSetBtn.onclick = () => {
+        axisWidthLocked = true;
+        if (axisWidthLabel) axisWidthLabel.remove();
+        if (axisWidthSlider) axisWidthSlider.remove();
+        axisWidthSetBtn.remove();
+    };
+}
+
 function registerSlider(slider) {
     if (!slider) return;
 
@@ -1071,6 +1121,7 @@ registerSlider(cubicSlider);
 registerSlider(rocketSizeSlider);
 registerSlider(trailWidthSlider);
 registerSlider(gateWidthSlider);
+registerSlider(axisWidthSlider);
 
 function renderSavedLevelButtons() {
     if (!savedLevelsList) return;
@@ -1169,6 +1220,7 @@ function updateGridForZoom() {
         currentLabelFontSize = labelFontSize;
     }
 
+    updateAxisStrokeStyles();
     updateGateLabelsForZoom();
     updateGateStrokesForZoom();
 }
@@ -1233,8 +1285,9 @@ function drawGrid(config, labelFontSize) {
     gridSvg.appendChild(gridGroup);
 
     const axisGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    axisGroup.dataset.role = "grid-axes";
     axisGroup.setAttribute("stroke", "#555");
-    axisGroup.setAttribute("stroke-width", "2");
+    axisGroup.setAttribute("stroke-width", axisStrokeWidth);
     axisGroup.setAttribute("shape-rendering", "crispEdges");
 
     const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -1242,6 +1295,7 @@ function drawGrid(config, labelFontSize) {
     yAxis.setAttribute("y1", 0);
     yAxis.setAttribute("x2", centerX);
     yAxis.setAttribute("y2", MAP_SIZE);
+    yAxis.setAttribute("vector-effect", "non-scaling-stroke");
     axisGroup.appendChild(yAxis);
 
     const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -1249,13 +1303,15 @@ function drawGrid(config, labelFontSize) {
     xAxis.setAttribute("y1", centerY);
     xAxis.setAttribute("x2", MAP_SIZE);
     xAxis.setAttribute("y2", centerY);
+    xAxis.setAttribute("vector-effect", "non-scaling-stroke");
     axisGroup.appendChild(xAxis);
 
     gridSvg.appendChild(axisGroup);
 
     const tickGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    tickGroup.dataset.role = "grid-ticks";
     tickGroup.setAttribute("stroke", "#777");
-    tickGroup.setAttribute("stroke-width", "1.5");
+    tickGroup.setAttribute("stroke-width", getTickStrokeWidth());
     tickGroup.setAttribute("shape-rendering", "crispEdges");
 
     const labelGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -1270,6 +1326,7 @@ function drawGrid(config, labelFontSize) {
         line.setAttribute("y1", y1);
         line.setAttribute("x2", x2);
         line.setAttribute("y2", y2);
+        line.setAttribute("vector-effect", "non-scaling-stroke");
         return line;
     }
 

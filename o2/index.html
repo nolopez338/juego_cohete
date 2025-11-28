@@ -13,7 +13,7 @@
 <div id="topPanelRow">
     <div id="topControls" class="panel">
         <div class="panelHeader">
-            <span>Sliders</span>
+            <span>Rocket 1 Sliders</span>
             <button class="panelToggle" data-target="topControls" aria-label="Toggle slider panel">−</button>
         </div>
         <div class="panelBody">
@@ -50,6 +50,14 @@
             </div>
 
             <div class="controlRow">
+                <span id="differenceToggleLabel">Show Difference Path</span>
+                <label class="toggleLabel">
+                    <input type="checkbox" id="differenceToggle" checked>
+                    <span>Toggle</span>
+                </label>
+            </div>
+
+            <div class="controlRow">
                 <span id="rocketSizeLabel">Rocket Size</span>
                 <input type="range" id="rocketSizeSlider" min="0.5" max="2" step="0.05" value="1">
                 <button id="rocketSizeSetBtn" class="secondaryBtn">Set</button>
@@ -77,6 +85,46 @@
                 <button id="resetBtn" class="secondaryBtn">Reset</button>
                 <button id="restartBtn" class="secondaryBtn">Restart</button>
                 <button id="nextBtn" class="secondaryBtn">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="topControlsB" class="panel">
+        <div class="panelHeader">
+            <span>Rocket 2 Sliders</span>
+            <button class="panelToggle" data-target="topControlsB" aria-label="Toggle slider panel">−</button>
+        </div>
+        <div class="panelBody">
+            <div class="controlRow">
+                <span>Y pos</span>
+                <input type="number" id="yMinInputB" class="rangeLimitInput" value="-100" step="1">
+                <input type="range" id="ySliderB" min="-100" max="100" value="0">
+                <input type="number" id="yInputB" class="numInput" min="-100" max="100" value="0">
+                <input type="number" id="yMaxInputB" class="rangeLimitInput" value="100" step="1">
+            </div>
+
+            <div class="controlRow">
+                <span>Slope</span>
+                <input type="number" id="slopeMinInputB" class="rangeLimitInput" value="-10" step="0.1">
+                <input type="range" id="slopeSliderB" min="-10" max="10" step="0.1" value="0">
+                <input type="number" id="slopeInputB" class="numInput" min="-10" max="10" step="0.1" value="0">
+                <input type="number" id="slopeMaxInputB" class="rangeLimitInput" value="10" step="0.1">
+            </div>
+
+            <div class="controlRow">
+                <span>Quad</span>
+                <input type="number" id="quadMinInputB" class="rangeLimitInput" value="-1" step="0.01">
+                <input type="range" id="quadSliderB" min="-1" max="1" step="0.01" value="0">
+                <input type="number" id="quadInputB" class="numInput" min="-1" max="1" step="0.01" value="0">
+                <input type="number" id="quadMaxInputB" class="rangeLimitInput" value="1" step="0.01">
+            </div>
+
+            <div class="controlRow">
+                <span>Cubic</span>
+                <input type="number" id="cubicMinInputB" class="rangeLimitInput" value="-0.01" step="0.0001">
+                <input type="range" id="cubicSliderB" min="-0.01" max="0.01" step="0.0001" value="0">
+                <input type="number" id="cubicInputB" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
+                <input type="number" id="cubicMaxInputB" class="rangeLimitInput" value="0.01" step="0.0001">
             </div>
         </div>
     </div>
@@ -131,7 +179,7 @@
             <svg id="gridSvg" xmlns="http://www.w3.org/2000/svg"></svg>
             <svg id="gateSvg" xmlns="http://www.w3.org/2000/svg"></svg>
             <svg id="trailSvg" xmlns="http://www.w3.org/2000/svg"></svg>
-            <div id="rocket" class="rocket" aria-hidden="true">
+            <div id="rocket" class="rocket rocketA" aria-hidden="true">
                 <svg class="rocketIcon" viewBox="0 0 60 90" role="presentation" focusable="false">
                     <defs>
                         <linearGradient id="rocketBody" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -145,6 +193,23 @@
                         <path d="M18 52 L8 64 L20 60 Z" fill="#f4a261" stroke="#c77422" stroke-width="2" />
                         <path d="M42 52 L52 64 L40 60 Z" fill="#f4a261" stroke="#c77422" stroke-width="2" />
                         <path d="M26 84 C28 88 32 88 34 84 C32 82 28 82 26 84 Z" fill="#f77f00" stroke="#c85c02" stroke-width="2" />
+                    </g>
+                </svg>
+            </div>
+            <div id="rocketB" class="rocket rocketB" aria-hidden="true">
+                <svg class="rocketIcon" viewBox="0 0 60 90" role="presentation" focusable="false">
+                    <defs>
+                        <linearGradient id="rocketBodyB" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#5eead4" />
+                            <stop offset="100%" stop-color="#4f46e5" />
+                        </linearGradient>
+                    </defs>
+                    <g>
+                        <path d="M30 4 C34 12 42 32 42 50 C42 64 37 82 30 86 C23 82 18 64 18 50 C18 32 26 12 30 4 Z" fill="url(#rocketBodyB)" stroke="#1e1b4b" stroke-width="2" />
+                        <ellipse cx="30" cy="45" rx="9" ry="12" fill="#0d2c54" stroke="#0b1e38" stroke-width="2" />
+                        <path d="M18 52 L8 64 L20 60 Z" fill="#a5b4fc" stroke="#4338ca" stroke-width="2" />
+                        <path d="M42 52 L52 64 L40 60 Z" fill="#a5b4fc" stroke="#4338ca" stroke-width="2" />
+                        <path d="M26 84 C28 88 32 88 34 84 C32 82 28 82 26 84 Z" fill="#22d3ee" stroke="#0891b2" stroke-width="2" />
                     </g>
                 </svg>
             </div>

@@ -91,15 +91,19 @@ document.addEventListener("mousemove", (e) => {
 // ====================================================
 
 const rocket = document.getElementById("rocket");
+const rocketB = document.getElementById("rocketB");
 const ROCKET_BASE_WIDTH = 40;
 const ROCKET_BASE_HEIGHT = 64;
 rocket.style.width = `${ROCKET_BASE_WIDTH}px`;
 rocket.style.height = `${ROCKET_BASE_HEIGHT}px`;
+rocketB.style.width = `${ROCKET_BASE_WIDTH}px`;
+rocketB.style.height = `${ROCKET_BASE_HEIGHT}px`;
 const gameArea = document.getElementById("gameArea");
 
 const gateSvg = document.getElementById("gateSvg");
 
 const topControlsPanel = document.getElementById("topControls");
+const topControlsPanelB = document.getElementById("topControlsB");
 
 const totalGatesLabel = document.getElementById("totalGatesCount");
 const hitsLabel = document.getElementById("hitsCount");
@@ -115,9 +119,21 @@ const slopeMinInput = document.getElementById("slopeMinInput");
 const slopeSlider = document.getElementById("slopeSlider");
 const slopeInput = document.getElementById("slopeInput");
 
+const yMinInputB = document.getElementById("yMinInputB");
+const ySliderB = document.getElementById("ySliderB");
+const yInputB = document.getElementById("yInputB");
+
+const slopeMinInputB = document.getElementById("slopeMinInputB");
+const slopeSliderB = document.getElementById("slopeSliderB");
+const slopeInputB = document.getElementById("slopeInputB");
+
 const quadMinInput = document.getElementById("quadMinInput");
 const quadSlider = document.getElementById("quadSlider");
 const quadInput = document.getElementById("quadInput");
+
+const quadMinInputB = document.getElementById("quadMinInputB");
+const quadSliderB = document.getElementById("quadSliderB");
+const quadInputB = document.getElementById("quadInputB");
 
 const cubicMinInput = document.getElementById("cubicMinInput");
 const cubicSlider = document.getElementById("cubicSlider");
@@ -126,6 +142,16 @@ const yMaxInput = document.getElementById("yMaxInput");
 const slopeMaxInput = document.getElementById("slopeMaxInput");
 const quadMaxInput = document.getElementById("quadMaxInput");
 const cubicMaxInput = document.getElementById("cubicMaxInput");
+
+const cubicMinInputB = document.getElementById("cubicMinInputB");
+const cubicSliderB = document.getElementById("cubicSliderB");
+const cubicInputB = document.getElementById("cubicInputB");
+const yMaxInputB = document.getElementById("yMaxInputB");
+const slopeMaxInputB = document.getElementById("slopeMaxInputB");
+const quadMaxInputB = document.getElementById("quadMaxInputB");
+const cubicMaxInputB = document.getElementById("cubicMaxInputB");
+
+const differenceToggle = document.getElementById("differenceToggle");
 
 const rocketSizeLabel = document.getElementById("rocketSizeLabel");
 const rocketSizeSlider = document.getElementById("rocketSizeSlider");
@@ -152,10 +178,15 @@ const sliderDefaults = {
     slope: parseFloat(slopeSlider.defaultValue),
     quad: parseFloat(quadSlider.defaultValue),
     cubic: parseFloat(cubicSlider.defaultValue),
+    yB: parseFloat(ySliderB.defaultValue),
+    slopeB: parseFloat(slopeSliderB.defaultValue),
+    quadB: parseFloat(quadSliderB.defaultValue),
+    cubicB: parseFloat(cubicSliderB.defaultValue),
     rocketSize: parseFloat(rocketSizeSlider.defaultValue) || DEFAULT_ROCKET_SIZE,
     trailWidth: parseFloat(trailWidthSlider?.defaultValue) || 3,
     gateWidth: parseFloat(gateWidthSlider?.defaultValue) || 3,
     axisWidth: parseFloat(axisWidthSlider?.defaultValue) || 2,
+    showDifference: differenceToggle?.checked ?? true,
 };
 
 function clampNumber(value, min, max) {
@@ -219,13 +250,22 @@ const savedLevels = [
 ];
 
 const trailSvg = document.getElementById("trailSvg");
-const trailPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-trailPath.setAttribute("fill", "none");
-trailPath.setAttribute("stroke", "cyan");
-trailPath.setAttribute("vector-effect", "non-scaling-stroke");
-trailPath.setAttribute("stroke-linecap", "round");
-trailPath.setAttribute("stroke-linejoin", "round");
-trailSvg.appendChild(trailPath);
+
+function createTrailPath(stroke, opacity = 1) {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", stroke);
+    path.setAttribute("vector-effect", "non-scaling-stroke");
+    path.setAttribute("stroke-linecap", "round");
+    path.setAttribute("stroke-linejoin", "round");
+    path.setAttribute("stroke-opacity", opacity);
+    trailSvg.appendChild(path);
+    return path;
+}
+
+const trailPath = createTrailPath("cyan", 1);
+const trailPathB = createTrailPath("#f472b6", 1);
+const diffTrailPath = createTrailPath("#94a3b8", 0.6);
 
 const MAP_SIZE = 3000;
 const WORLD_CENTER = MAP_SIZE / 2;
@@ -243,6 +283,7 @@ trailSvg.setAttribute("height", MAP_SIZE);
 trailSvg.setAttribute("viewBox", `0 0 ${MAP_SIZE} ${MAP_SIZE}`);
 
 let rocketX, rocketY;
+let rocketXB, rocketYB;
 let rocketSize = parseFloat(rocketSizeSlider.value) || DEFAULT_ROCKET_SIZE;
 let rocketSizeLocked = false;
 let trailWidthLocked = false;
@@ -254,21 +295,32 @@ let axisStrokeWidth = parseFloat(axisWidthSlider?.value) || sliderDefaults.axisW
 let slope = 0;
 let quad = 0;
 let cubic = 0;
+let slopeB = 0;
+let quadB = 0;
+let cubicB = 0;
 let speed = 6;
 let facing = "right";
 let rocketAngle = 90;
+let rocketAngleB = 90;
 
 setRocketSize(rocketSize, false);
 setTrailWidth(trailStrokeWidth);
 setGateWidth(gateBaseStrokeWidth);
 setAxisWidth(axisStrokeWidth);
+toggleDifferencePathVisibility();
 updateRocketSizeControls();
 updateRocketTransform();
 
 let anim = null;
 let lastTrailX = null;
 let lastTrailY = null;
+let lastTrailXB = null;
+let lastTrailYB = null;
+let lastDiffX = null;
+let lastDiffY = null;
 let trailPathData = "";
+let trailPathDataB = "";
+let diffTrailPathData = "";
 let frameCount = 0;
 
 let inFlight = false;
@@ -528,30 +580,45 @@ function toScreenY(value) {
 
 function updateRocketTransform() {
     const zoomCompensation = 1 / zoom;
-    rocket.style.setProperty("--rocket-zoom-compensation", zoomCompensation);
-    rocket.style.transform = `scale(${zoomCompensation}) rotate(${rocketAngle}deg)`;
+    [
+        { el: rocket, angle: rocketAngle },
+        { el: rocketB, angle: rocketAngleB },
+    ].forEach(({ el, angle }) => {
+        el.style.setProperty("--rocket-zoom-compensation", zoomCompensation);
+        el.style.transform = `scale(${zoomCompensation}) rotate(${angle}deg)`;
+    });
 }
 
 function updateRocketSize(maintainCenter = true) {
-    const previousWidth = rocket.clientWidth;
-    const previousHeight = rocket.clientHeight;
-    const canMaintainCenter = maintainCenter &&
-        rocketX !== undefined && rocketY !== undefined;
-    const centerX = canMaintainCenter ? rocketX + previousWidth / 2 : null;
-    const centerY = canMaintainCenter ? rocketY + previousHeight / 2 : null;
+    const update = (el, pos) => {
+        const previousWidth = el.clientWidth;
+        const previousHeight = el.clientHeight;
+        const canMaintainCenter = maintainCenter && pos.x !== undefined && pos.y !== undefined;
+        const centerX = canMaintainCenter ? pos.x + previousWidth / 2 : null;
+        const centerY = canMaintainCenter ? pos.y + previousHeight / 2 : null;
 
-    const width = ROCKET_BASE_WIDTH * rocketSize;
-    const height = ROCKET_BASE_HEIGHT * rocketSize;
+        const width = ROCKET_BASE_WIDTH * rocketSize;
+        const height = ROCKET_BASE_HEIGHT * rocketSize;
 
-    rocket.style.width = `${width}px`;
-    rocket.style.height = `${height}px`;
+        el.style.width = `${width}px`;
+        el.style.height = `${height}px`;
 
-    if (canMaintainCenter) {
-        rocketX = centerX - width / 2;
-        rocketY = centerY - height / 2;
-        rocket.style.left = rocketX + "px";
-        rocket.style.top = rocketY + "px";
-    }
+        if (canMaintainCenter) {
+            pos.x = centerX - width / 2;
+            pos.y = centerY - height / 2;
+            el.style.left = pos.x + "px";
+            el.style.top = pos.y + "px";
+        }
+    };
+
+    const posA = { x: rocketX, y: rocketY };
+    const posB = { x: rocketXB, y: rocketYB };
+    update(rocket, posA);
+    update(rocketB, posB);
+    rocketX = posA.x;
+    rocketY = posA.y;
+    rocketXB = posB.x;
+    rocketYB = posB.y;
 }
 
 function updateRocketSizeControls() {
@@ -575,7 +642,13 @@ function setTrailWidth(value) {
     if (trailWidthSlider) {
         trailWidthSlider.value = clamped;
     }
-    trailPath.setAttribute("stroke-width", clamped);
+    [trailPath, trailPathB].forEach(path => path.setAttribute("stroke-width", clamped));
+    diffTrailPath.setAttribute("stroke-width", clamped * 0.8);
+}
+
+function toggleDifferencePathVisibility() {
+    const visible = differenceToggle ? differenceToggle.checked : true;
+    diffTrailPath.style.display = visible ? "" : "none";
 }
 
 function setGateWidth(value) {
@@ -814,11 +887,19 @@ function setControlsDisabled(disabled) {
         slopeMinInput, slopeSlider, slopeInput, slopeMaxInput,
         quadMinInput, quadSlider, quadInput, quadMaxInput,
         cubicMinInput, cubicSlider, cubicInput, cubicMaxInput,
+        yMinInputB, ySliderB, yInputB, yMaxInputB,
+        slopeMinInputB, slopeSliderB, slopeInputB, slopeMaxInputB,
+        quadMinInputB, quadSliderB, quadInputB, quadMaxInputB,
+        cubicMinInputB, cubicSliderB, cubicInputB, cubicMaxInputB,
         gateXInput, gateY1Input, gateY2Input,
-        addGateBtn
+        addGateBtn,
+        differenceToggle
     ];
 
-    elements.forEach(el => el.disabled = disabled);
+    elements.forEach(el => {
+        if (!el) return;
+        el.disabled = disabled;
+    });
 
     gateList.querySelectorAll("input, button").forEach(el => {
         el.disabled = disabled;
@@ -850,10 +931,20 @@ function resetSlidersToDefaults() {
     handleQuadChange(sliderDefaults.quad);
     handleCubicChange(sliderDefaults.cubic);
 
+    handleYChangeB(sliderDefaults.yB);
+    handleSlopeChangeB(sliderDefaults.slopeB);
+    handleQuadChangeB(sliderDefaults.quadB);
+    handleCubicChangeB(sliderDefaults.cubicB);
+
     setTrailWidth(sliderDefaults.trailWidth);
     setRocketSize(sliderDefaults.rocketSize);
     setGateWidth(sliderDefaults.gateWidth);
     setAxisWidth(sliderDefaults.axisWidth);
+
+    if (differenceToggle) {
+        differenceToggle.checked = sliderDefaults.showDifference;
+        toggleDifferencePathVisibility();
+    }
 }
 
 // RESET
@@ -863,20 +954,40 @@ function resetRocket() {
 
     facing = "right";
     rocketAngle = 90;
+    rocketAngleB = 90;
 
     trailPathData = "";
     trailPath.setAttribute("d", "");
     lastTrailX = null;
     lastTrailY = null;
 
+    trailPathDataB = "";
+    trailPathB.setAttribute("d", "");
+    lastTrailXB = null;
+    lastTrailYB = null;
+
+    diffTrailPathData = "";
+    diffTrailPath.setAttribute("d", "");
+    lastDiffX = null;
+    lastDiffY = null;
+
     const yCenter = parseFloat(ySlider.value);
     const safeYCenter = Number.isFinite(yCenter) ? yCenter : 0;
+
+    const yCenterB = parseFloat(ySliderB.value);
+    const safeYCenterB = Number.isFinite(yCenterB) ? yCenterB : 0;
 
     rocketX = WORLD_CENTER - rocket.clientWidth / 2;
     rocketY = convertCenterToScreen(safeYCenter);
 
+    rocketXB = WORLD_CENTER - rocketB.clientWidth / 2;
+    rocketYB = convertCenterToScreen(safeYCenterB);
+
     rocket.style.left = rocketX + "px";
     rocket.style.top  = rocketY + "px";
+
+    rocketB.style.left = rocketXB + "px";
+    rocketB.style.top  = rocketYB + "px";
 
     frameCount = 0;
 
@@ -965,6 +1076,12 @@ function setRocketFromCenter(v) {
     rocket.style.top = rocketY + "px";
 }
 
+function setRocketFromCenterB(v) {
+    if (inFlight || frozen) return;
+    rocketYB = convertCenterToScreen(v);
+    rocketB.style.top = rocketYB + "px";
+}
+
 // SLIDERS
 function handleYChange(value) {
     const min = parseFloat(ySlider.min);
@@ -973,6 +1090,15 @@ function handleYChange(value) {
     ySlider.value = clamped;
     yInput.value = clamped;
     setRocketFromCenter(parseInt(clamped));
+}
+
+function handleYChangeB(value) {
+    const min = parseFloat(ySliderB.min);
+    const max = parseFloat(ySliderB.max);
+    const clamped = clampNumber(value, min, max);
+    ySliderB.value = clamped;
+    yInputB.value = clamped;
+    setRocketFromCenterB(parseInt(clamped));
 }
 
 function handleSlopeChange(value) {
@@ -984,6 +1110,15 @@ function handleSlopeChange(value) {
     slope = clamped;
 }
 
+function handleSlopeChangeB(value) {
+    const min = parseFloat(slopeSliderB.min);
+    const max = parseFloat(slopeSliderB.max);
+    const clamped = clampNumber(value, min, max);
+    slopeSliderB.value = clamped;
+    slopeInputB.value = clamped;
+    slopeB = clamped;
+}
+
 function handleQuadChange(value) {
     const min = parseFloat(quadSlider.min);
     const max = parseFloat(quadSlider.max);
@@ -991,6 +1126,15 @@ function handleQuadChange(value) {
     quadSlider.value = clamped;
     quadInput.value = clamped;
     quad = clamped;
+}
+
+function handleQuadChangeB(value) {
+    const min = parseFloat(quadSliderB.min);
+    const max = parseFloat(quadSliderB.max);
+    const clamped = clampNumber(value, min, max);
+    quadSliderB.value = clamped;
+    quadInputB.value = clamped;
+    quadB = clamped;
 }
 
 function handleCubicChange(value) {
@@ -1002,17 +1146,38 @@ function handleCubicChange(value) {
     cubic = clamped;
 }
 
+function handleCubicChangeB(value) {
+    const min = parseFloat(cubicSliderB.min);
+    const max = parseFloat(cubicSliderB.max);
+    const clamped = clampNumber(value, min, max);
+    cubicSliderB.value = clamped;
+    cubicInputB.value = clamped;
+    cubicB = clamped;
+}
+
 ySlider.oninput = () => handleYChange(parseFloat(ySlider.value));
 yInput.oninput = () => handleYChange(parseFloat(yInput.value));
+
+ySliderB.oninput = () => handleYChangeB(parseFloat(ySliderB.value));
+yInputB.oninput = () => handleYChangeB(parseFloat(yInputB.value));
 
 slopeSlider.oninput = () => handleSlopeChange(parseFloat(slopeSlider.value));
 slopeInput.oninput = () => handleSlopeChange(parseFloat(slopeInput.value));
 
+slopeSliderB.oninput = () => handleSlopeChangeB(parseFloat(slopeSliderB.value));
+slopeInputB.oninput = () => handleSlopeChangeB(parseFloat(slopeInputB.value));
+
 quadSlider.oninput = () => handleQuadChange(parseFloat(quadSlider.value));
 quadInput.oninput = () => handleQuadChange(parseFloat(quadInput.value));
 
+quadSliderB.oninput = () => handleQuadChangeB(parseFloat(quadSliderB.value));
+quadInputB.oninput = () => handleQuadChangeB(parseFloat(quadInputB.value));
+
 cubicSlider.oninput = () => handleCubicChange(parseFloat(cubicSlider.value));
 cubicInput.oninput = () => handleCubicChange(parseFloat(cubicInput.value));
+
+cubicSliderB.oninput = () => handleCubicChangeB(parseFloat(cubicSliderB.value));
+cubicInputB.oninput = () => handleCubicChangeB(parseFloat(cubicInputB.value));
 
 setupRangeLimits({
     slider: ySlider,
@@ -1046,6 +1211,38 @@ setupRangeLimits({
     onValueUpdated: handleCubicChange,
 });
 
+setupRangeLimits({
+    slider: ySliderB,
+    minInput: yMinInputB,
+    maxInput: yMaxInputB,
+    valueInput: yInputB,
+    onValueUpdated: handleYChangeB,
+});
+
+setupRangeLimits({
+    slider: slopeSliderB,
+    minInput: slopeMinInputB,
+    maxInput: slopeMaxInputB,
+    valueInput: slopeInputB,
+    onValueUpdated: handleSlopeChangeB,
+});
+
+setupRangeLimits({
+    slider: quadSliderB,
+    minInput: quadMinInputB,
+    maxInput: quadMaxInputB,
+    valueInput: quadInputB,
+    onValueUpdated: handleQuadChangeB,
+});
+
+setupRangeLimits({
+    slider: cubicSliderB,
+    minInput: cubicMinInputB,
+    maxInput: cubicMaxInputB,
+    valueInput: cubicInputB,
+    onValueUpdated: handleCubicChangeB,
+});
+
 rocketSizeSlider.oninput = () => {
     setRocketSize(parseFloat(rocketSizeSlider.value));
 };
@@ -1061,6 +1258,10 @@ if (trailWidthSlider) {
     trailWidthSlider.oninput = () => {
         setTrailWidth(parseFloat(trailWidthSlider.value));
     };
+}
+
+if (differenceToggle) {
+    differenceToggle.onchange = toggleDifferencePathVisibility;
 }
 
 if (trailWidthSetBtn) {
@@ -1118,6 +1319,10 @@ registerSlider(ySlider);
 registerSlider(slopeSlider);
 registerSlider(quadSlider);
 registerSlider(cubicSlider);
+registerSlider(ySliderB);
+registerSlider(slopeSliderB);
+registerSlider(quadSliderB);
+registerSlider(cubicSliderB);
 registerSlider(rocketSizeSlider);
 registerSlider(trailWidthSlider);
 registerSlider(gateWidthSlider);
@@ -1139,14 +1344,16 @@ function renderSavedLevelButtons() {
 }
 
 makePanelDraggable(topControlsPanel);
+makePanelDraggable(topControlsPanelB);
 makePanelDraggable(gateControlsPanel);
 makePanelDraggable(savedLevelsPanel);
 initializeCollapsible(topControlsPanel);
+initializeCollapsible(topControlsPanelB);
 initializeCollapsible(gateControlsPanel);
 initializeCollapsible(savedLevelsPanel);
 
 window.addEventListener("resize", () => {
-    [topControlsPanel, gateControlsPanel, savedLevelsPanel].forEach(panel => {
+    [topControlsPanel, topControlsPanelB, gateControlsPanel, savedLevelsPanel].forEach(panel => {
         if (!panel || panel.classList.contains("collapsed")) return;
         const body = panel.querySelector(".panelBody");
         if (!body) return;
@@ -1378,13 +1585,27 @@ updateGridForZoom();
 drawGates();
 
 // TRAIL
-function drawTrail(x1, y1, x2, y2) {
-    if (!trailPathData) {
-        trailPathData = `M ${x1} ${y1}`;
+function appendTrail(pathEl, existing, x1, y1, x2, y2) {
+    let updated = existing;
+    if (!updated) {
+        updated = `M ${x1} ${y1}`;
     }
 
-    trailPathData += ` L ${x2} ${y2}`;
-    trailPath.setAttribute("d", trailPathData);
+    updated += ` L ${x2} ${y2}`;
+    pathEl.setAttribute("d", updated);
+    return updated;
+}
+
+function drawTrail(x1, y1, x2, y2) {
+    trailPathData = appendTrail(trailPath, trailPathData, x1, y1, x2, y2);
+}
+
+function drawTrailB(x1, y1, x2, y2) {
+    trailPathDataB = appendTrail(trailPathB, trailPathDataB, x1, y1, x2, y2);
+}
+
+function drawDiffTrail(x1, y1, x2, y2) {
+    diffTrailPathData = appendTrail(diffTrailPath, diffTrailPathData, x1, y1, x2, y2);
 }
 
 // ROTATION
@@ -1392,6 +1613,7 @@ function rotateRocket(dir) {
     if (inFlight || frozen) return;
     facing = dir;
     rocketAngle = dir === "right" ? 90 : -90;
+    rocketAngleB = rocketAngle;
     updateRocketTransform();
 }
 
@@ -1453,32 +1675,70 @@ function launchRocket() {
     lastTrailX = rocketX + rocket.clientWidth / 2;
     lastTrailY = rocketY + rocket.clientHeight / 2;
 
+    lastTrailXB = rocketXB + rocketB.clientWidth / 2;
+    lastTrailYB = rocketYB + rocketB.clientHeight / 2;
+
+    const startDiff = convertScreenToCenter(lastTrailY) - convertScreenToCenter(lastTrailYB);
+    lastDiffX = lastTrailX;
+    lastDiffY = toScreenY(startDiff);
+
     function update() {
 
         const prevX = rocketX + rocket.clientWidth / 2;
         const prevY = rocketY + rocket.clientHeight / 2;
 
+        const prevXB = rocketXB + rocketB.clientWidth / 2;
+        const prevYB = rocketYB + rocketB.clientHeight / 2;
+
         rocketX += (facing === "right" ? speed : -speed);
+        rocketXB += (facing === "right" ? speed : -speed);
 
         rocketY -= slope;
         rocketY -= quad  * frameCount * frameCount;
         rocketY -= cubic * frameCount * frameCount * frameCount;
+
+        rocketYB -= slopeB;
+        rocketYB -= quadB * frameCount * frameCount;
+        rocketYB -= cubicB * frameCount * frameCount * frameCount;
 
         frameCount++;
 
         rocket.style.left = rocketX + "px";
         rocket.style.top  = rocketY + "px";
 
+        rocketB.style.left = rocketXB + "px";
+        rocketB.style.top  = rocketYB + "px";
+
         const newX = rocketX + rocket.clientWidth / 2;
         const newY = rocketY + rocket.clientHeight / 2;
+
+        const newXB = rocketXB + rocketB.clientWidth / 2;
+        const newYB = rocketYB + rocketB.clientHeight / 2;
 
         if (lastTrailX !== null)
             drawTrail(prevX, prevY, newX, newY);
 
+        if (lastTrailXB !== null)
+            drawTrailB(prevXB, prevYB, newXB, newYB);
+
+        const prevDiffWorld = convertScreenToCenter(prevY) - convertScreenToCenter(prevYB);
+        const newDiffWorld = convertScreenToCenter(newY) - convertScreenToCenter(newYB);
+        const prevDiffY = toScreenY(prevDiffWorld);
+        const newDiffY = toScreenY(newDiffWorld);
+
+        if (lastDiffX !== null)
+            drawDiffTrail(prevX, prevDiffY, newX, newDiffY);
+
         lastTrailX = newX;
         lastTrailY = newY;
 
-        checkCollision(prevX, newX, newY);
+        lastTrailXB = newXB;
+        lastTrailYB = newYB;
+
+        lastDiffX = newX;
+        lastDiffY = newDiffY;
+
+        checkCollision(prevX, newX, prevDiffY, newDiffY);
 
         const rocketCenterX = newX - WORLD_CENTER;
         if (!roundFinished && hasReachedEnd(rocketCenterX))
@@ -1492,21 +1752,23 @@ function launchRocket() {
 }
 
 // COLLISION
-function checkCollision(prevX, newX, centerY) {
+function checkCollision(prevX, newX, prevDiffY, newDiffY) {
     if (roundFinished) return;
 
     const offMap =
         rocketX < -rocket.clientWidth ||
         rocketX > MAP_SIZE ||
         rocketY < -rocket.clientHeight ||
-        rocketY > MAP_SIZE;
+        rocketY > MAP_SIZE ||
+        rocketXB < -rocketB.clientWidth ||
+        rocketXB > MAP_SIZE ||
+        rocketYB < -rocketB.clientHeight ||
+        rocketYB > MAP_SIZE;
 
     if (offMap) {
         finalizeRun();
         return;
     }
-
-    let gateProcessed = false;
 
     for (const gate of gates) {
         if (!activeRunGateIds.has(gate.id) || gatesCrossed.has(gate.id)) continue;
@@ -1518,12 +1780,14 @@ function checkCollision(prevX, newX, centerY) {
 
         if (!crossed) continue;
 
-        gateProcessed = true;
         gatesCrossed.add(gate.id);
+
+        const t = (gateX - prevX) / (newX - prevX);
+        const diffAtGate = prevDiffY + (newDiffY - prevDiffY) * t;
 
         const gapTop = Math.min(toScreenY(gate.y1), toScreenY(gate.y2));
         const gapBottom = Math.max(toScreenY(gate.y1), toScreenY(gate.y2));
-        const hit = centerY >= gapTop && centerY <= gapBottom;
+        const hit = diffAtGate >= gapTop && diffAtGate <= gapBottom;
 
         if (hit) scoreBoard.recordHit();
         else     scoreBoard.recordMiss();

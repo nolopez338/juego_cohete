@@ -124,6 +124,14 @@ const cubicSlider = document.getElementById("cubicSlider");
 const cubicInput = document.getElementById("cubicInput");
 
 const resetBtn = document.getElementById("resetBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+const sliderDefaults = {
+    y: parseFloat(ySlider.defaultValue),
+    slope: parseFloat(slopeSlider.defaultValue),
+    quad: parseFloat(quadSlider.defaultValue),
+    cubic: parseFloat(cubicSlider.defaultValue),
+};
 
 const gateXInput = document.getElementById("gateXInput");
 const gateY1Input = document.getElementById("gateY1Input");
@@ -592,6 +600,33 @@ function showResetButton() {
     resetBtn.style.display = "inline-block";
 }
 
+function clearGates() {
+    gates = [];
+    gateIdCounter = 1;
+    activeRunGateIds = new Set();
+    gatesCrossed = new Set();
+    drawGates();
+    updateGateInfo();
+    renderGateList();
+}
+
+function resetSlidersToDefaults() {
+    ySlider.value = sliderDefaults.y;
+    yInput.value = sliderDefaults.y;
+
+    slopeSlider.value = sliderDefaults.slope;
+    slopeInput.value = sliderDefaults.slope;
+    slope = sliderDefaults.slope;
+
+    quadSlider.value = sliderDefaults.quad;
+    quadInput.value = sliderDefaults.quad;
+    quad = sliderDefaults.quad;
+
+    cubicSlider.value = sliderDefaults.cubic;
+    cubicInput.value = sliderDefaults.cubic;
+    cubic = sliderDefaults.cubic;
+}
+
 // RESET
 function resetRocket() {
     cancelAnimationFrame(anim);
@@ -631,6 +666,14 @@ function resetRocket() {
 }
 
 function resetGame() {
+    scoreBoard.resetAll();
+    resetRocket();
+}
+
+function nextIteration() {
+    resetSlidersToDefaults();
+    clearGates();
+    scoreBoard.resetAll();
     resetRocket();
 }
 
@@ -728,6 +771,7 @@ addGateBtn.onclick = () => {
 };
 
 resetBtn.onclick = () => resetGame();
+nextBtn.onclick = () => nextIteration();
 
 // VIEWPORT SETUP
 function setDefaultView() {

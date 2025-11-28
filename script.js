@@ -52,6 +52,7 @@ document.addEventListener("wheel", (e) => {
     translateX = pointerX - worldX * zoom;
     translateY = pointerY - worldY * zoom;
 
+    updateGridForZoom();
     applyTransform();
 
 }, { passive: false });
@@ -146,14 +147,19 @@ const ctx = canvas.getContext("2d");
 const MAP_SIZE = 3000;
 const WORLD_CENTER = MAP_SIZE / 2;
 
-gridCanvas.width = MAP_SIZE;
-gridCanvas.height = MAP_SIZE;
+function setupHighDpiCanvas(canvasEl, context) {
+    const dpr = window.devicePixelRatio || 1;
+    canvasEl.style.width = `${MAP_SIZE}px`;
+    canvasEl.style.height = `${MAP_SIZE}px`;
+    canvasEl.width = MAP_SIZE * dpr;
+    canvasEl.height = MAP_SIZE * dpr;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context.imageSmoothingEnabled = false;
+}
 
-gateCanvas.width = MAP_SIZE;
-gateCanvas.height = MAP_SIZE;
-
-canvas.width = MAP_SIZE;
-canvas.height = MAP_SIZE;
+setupHighDpiCanvas(gridCanvas, gridCtx);
+setupHighDpiCanvas(gateCanvas, gateCtx);
+setupHighDpiCanvas(canvas, ctx);
 
 let rocketX, rocketY;
 let slope = 0;
@@ -178,6 +184,17 @@ let gates = [];
 let gateIdCounter = 1;
 let gatesCrossed = new Set();
 let activeRunGateIds = new Set();
+
+const GRID_ZOOM_STEPS = [
+    { maxPercent: 100, gridSpacing: 200, labelSpacing: 200 },
+    { maxPercent: 300, gridSpacing: 120, labelSpacing: 120 },
+    { maxPercent: 800, gridSpacing: 60, labelSpacing: 60 },
+    { maxPercent: 1500, gridSpacing: 30, labelSpacing: 30 },
+    { maxPercent: 3000, gridSpacing: 15, labelSpacing: 15 },
+    { maxPercent: Infinity, gridSpacing: 8, labelSpacing: 8 },
+];
+
+let currentGridConfig = null;
 
 class ScoreBoard {
     constructor(hitsEl, missesEl, totalEl, hitDotsEl, missDotsEl) {
@@ -781,32 +798,50 @@ function setDefaultView() {
     );
 
     zoom = Math.min(Math.max(targetZoom, 0.2), MAX_ZOOM);
+    updateGridForZoom();
 }
 
 // GRID
-function drawGrid() {
-    const gridSpacing = 100;
-    const tickLength = 12;
-    const labelSpacing = 500;
-    const centerX = gridCanvas.width / 2;
-    const centerY = gridCanvas.height / 2;
+function getGridConfigForZoom(zoomLevel) {
+    const zoomPercent = zoomLevel * 100;
+    return GRID_ZOOM_STEPS.find(step => zoomPercent <= step.maxPercent);
+}
 
-    gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+function updateGridForZoom() {
+    const config = getGridConfigForZoom(zoom);
+    if (!config) return;
+    const spacingChanged = !currentGridConfig ||
+        config.gridSpacing !== currentGridConfig.gridSpacing ||
+        config.labelSpacing !== currentGridConfig.labelSpacing;
+
+    if (spacingChanged) {
+        currentGridConfig = config;
+        drawGrid(config);
+    }
+}
+
+function drawGrid(config) {
+    const gridSpacing = config.gridSpacing;
+    const tickLength = 12;
+    const centerX = MAP_SIZE / 2;
+    const centerY = MAP_SIZE / 2;
+
+    gridCtx.clearRect(0, 0, MAP_SIZE, MAP_SIZE);
 
     gridCtx.strokeStyle = "#2d2d2d";
     gridCtx.lineWidth = 1;
 
-    for (let x = 0; x <= gridCanvas.width; x += gridSpacing) {
+    for (let x = 0; x <= MAP_SIZE; x += gridSpacing) {
         gridCtx.beginPath();
         gridCtx.moveTo(x, 0);
-        gridCtx.lineTo(x, gridCanvas.height);
+        gridCtx.lineTo(x, MAP_SIZE);
         gridCtx.stroke();
     }
 
-    for (let y = 0; y <= gridCanvas.height; y += gridSpacing) {
+    for (let y = 0; y <= MAP_SIZE; y += gridSpacing) {
         gridCtx.beginPath();
         gridCtx.moveTo(0, y);
-        gridCtx.lineTo(gridCanvas.width, y);
+        gridCtx.lineTo(MAP_SIZE, y);
         gridCtx.stroke();
     }
 
@@ -815,12 +850,12 @@ function drawGrid() {
 
     gridCtx.beginPath();
     gridCtx.moveTo(centerX, 0);
-    gridCtx.lineTo(centerX, gridCanvas.height);
+    gridCtx.lineTo(centerX, MAP_SIZE);
     gridCtx.stroke();
 
     gridCtx.beginPath();
     gridCtx.moveTo(0, centerY);
-    gridCtx.lineTo(gridCanvas.width, centerY);
+    gridCtx.lineTo(MAP_SIZE, centerY);
     gridCtx.stroke();
 
     gridCtx.strokeStyle = "#777";
@@ -841,54 +876,46 @@ function drawGrid() {
         gridCtx.stroke();
     }
 
-    for (let offset = 0; offset <= gridCanvas.width / 2; offset += gridSpacing) {
+    for (let offset = 0; offset <= MAP_SIZE / 2; offset += gridSpacing) {
         const xPos = centerX + offset;
         const xNeg = centerX - offset;
 
-        if (xPos <= gridCanvas.width) {
+        if (xPos <= MAP_SIZE) {
             drawVerticalTick(xPos);
-            if (offset % labelSpacing === 0) {
-                gridCtx.textAlign = "center";
-                gridCtx.textBaseline = "top";
-                gridCtx.fillText(offset, xPos, centerY + tickLength / 2 + 4);
-            }
+            gridCtx.textAlign = "center";
+            gridCtx.textBaseline = "top";
+            gridCtx.fillText(offset, xPos, centerY + tickLength / 2 + 4);
         }
 
         if (offset !== 0 && xNeg >= 0) {
             drawVerticalTick(xNeg);
-            if (offset % labelSpacing === 0) {
-                gridCtx.textAlign = "center";
-                gridCtx.textBaseline = "top";
-                gridCtx.fillText(-offset, xNeg, centerY + tickLength / 2 + 4);
-            }
+            gridCtx.textAlign = "center";
+            gridCtx.textBaseline = "top";
+            gridCtx.fillText(-offset, xNeg, centerY + tickLength / 2 + 4);
         }
     }
 
-    for (let offset = 0; offset <= gridCanvas.height / 2; offset += gridSpacing) {
+    for (let offset = 0; offset <= MAP_SIZE / 2; offset += gridSpacing) {
         const yPos = centerY + offset;
         const yNeg = centerY - offset;
 
-        if (yPos <= gridCanvas.height) {
+        if (yPos <= MAP_SIZE) {
             drawHorizontalTick(yPos);
-            if (offset % labelSpacing === 0 && offset !== 0) {
-                gridCtx.textAlign = "right";
-                gridCtx.textBaseline = "middle";
-                gridCtx.fillText(-offset, centerX - tickLength / 2 - 6, yPos);
-            }
+            gridCtx.textAlign = "right";
+            gridCtx.textBaseline = "middle";
+            gridCtx.fillText(-offset, centerX - tickLength / 2 - 6, yPos);
         }
 
-        if (yNeg >= 0) {
+        if (offset !== 0 && yNeg >= 0) {
             drawHorizontalTick(yNeg);
-            if (offset % labelSpacing === 0 && offset !== 0) {
-                gridCtx.textAlign = "right";
-                gridCtx.textBaseline = "middle";
-                gridCtx.fillText(offset, centerX - tickLength / 2 - 6, yNeg);
-            }
+            gridCtx.textAlign = "right";
+            gridCtx.textBaseline = "middle";
+            gridCtx.fillText(offset, centerX - tickLength / 2 - 6, yNeg);
         }
     }
 }
 
-drawGrid();
+updateGridForZoom();
 drawGates();
 
 // TRAIL

@@ -75,6 +75,8 @@ body {
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(4px);
     width: min(520px, 95vw);
+    max-height: calc(100vh - 20px);
+    overflow: auto;
     z-index: 20;
     transition: width 0.25s ease, padding 0.25s ease;
 }

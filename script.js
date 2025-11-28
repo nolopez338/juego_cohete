@@ -24,6 +24,7 @@ function centerGraphOnRocket() {
 
 // --- MOUSE ZOOM ---
 document.addEventListener("wheel", (e) => {
+    if (frozen) return;
     e.preventDefault();
 
     const zoomStep = 1.1;
@@ -48,6 +49,7 @@ let isPanning = false;
 let startX = 0, startY = 0;
 
 document.addEventListener("mousedown", (e) => {
+    if (frozen) return;
     if (sliderActive) return;
 
     isPanning = true;
@@ -61,6 +63,7 @@ document.addEventListener("mouseup", () => {
 });
 
 document.addEventListener("mousemove", (e) => {
+    if (frozen) return;
     if (!isPanning) return;
 
     translateX = e.clientX - startX;
@@ -140,8 +143,11 @@ let lastTrailY = null;
 let frameCount = 0;
 
 let inFlight = false;
-let popupActive = false;
 let roundFinished = false;
+let frozen = false;
+
+let endThresholdX = null;
+let lastGateTargetX = null;
 
 let gates = [];
 let gateIdCounter = 1;
@@ -455,6 +461,31 @@ function updateGateInfo() {
     gateBottomLabel.textContent = Math.round(next.y2);
 }
 
+function setControlsDisabled(disabled) {
+    const elements = [
+        ySlider, yInput,
+        slopeSlider, slopeInput,
+        quadSlider, quadInput,
+        cubicSlider, cubicInput,
+        gateXInput, gateY1Input, gateY2Input,
+        addGateBtn
+    ];
+
+    elements.forEach(el => el.disabled = disabled);
+
+    gateList.querySelectorAll("input, button").forEach(el => {
+        el.disabled = disabled;
+    });
+}
+
+function hideResetButton() {
+    resetBtn.style.display = "none";
+}
+
+function showResetButton() {
+    resetBtn.style.display = "inline-block";
+}
+
 // RESET
 function resetRocket() {
     cancelAnimationFrame(anim);
@@ -477,6 +508,10 @@ function resetRocket() {
 
     frameCount = 0;
 
+    frozen = false;
+    endThresholdX = null;
+    lastGateTargetX = null;
+
     const c = convertScreenToCenter(rocketY);
     ySlider.value = yInput.value = c;
 
@@ -485,6 +520,9 @@ function resetRocket() {
     gatesCrossed = new Set();
     activeRunGateIds = new Set();
     scoreBoard.resetRun();
+
+    setControlsDisabled(false);
+    hideResetButton();
 
     centerGraphOnRocket();
     updateGateInfo();
@@ -504,14 +542,11 @@ function resetGame() {
     updateGateInfo();
 
     scoreBoard.resetAll();
-
-    document.getElementById("popupOverlay").style.display = "none";
-    popupActive = false;
 }
 
 // BEFORE LAUNCH
 function setRocketFromCenter(v) {
-    if (inFlight || popupActive) return;
+    if (inFlight || frozen) return;
     rocketY = convertCenterToScreen(v);
     rocket.style.top = rocketY + "px";
 }
@@ -708,20 +743,62 @@ function drawTrail(x1, y1, x2, y2) {
 
 // ROTATION
 function rotateRocket(dir) {
-    if (inFlight || popupActive) return;
+    if (inFlight || frozen) return;
     facing = dir;
     rocket.style.transform =
         dir === "right" ? "rotate(90deg)" : "rotate(-90deg)";
     updateGateInfo();
 }
 
+function calculateEndThreshold(gatesInPath) {
+    const rocketCenterX = rocketX + rocket.clientWidth / 2 - WORLD_CENTER;
+
+    if (gatesInPath.length) {
+        lastGateTargetX = facing === "right"
+            ? Math.max(...gatesInPath.map(gate => gate.x))
+            : Math.min(...gatesInPath.map(gate => gate.x));
+    } else {
+        lastGateTargetX = rocketCenterX;
+    }
+
+    endThresholdX = lastGateTargetX + (facing === "right" ? 100 : -100);
+}
+
+function hasReachedEnd(rocketCenterX) {
+    if (endThresholdX === null) return false;
+
+    return facing === "right"
+        ? rocketCenterX >= endThresholdX
+        : rocketCenterX <= endThresholdX;
+}
+
+function freezeSimulation() {
+    if (roundFinished || frozen) return;
+
+    cancelAnimationFrame(anim);
+    anim = null;
+    inFlight = false;
+    roundFinished = true;
+    frozen = true;
+
+    setControlsDisabled(true);
+    showResetButton();
+}
+
+function finalizeRun() {
+    scoreBoard.finalizeRemainingAsMisses();
+    freezeSimulation();
+}
+
 // LAUNCH
 function launchRocket() {
-    if (inFlight || popupActive) return;
+    if (inFlight || frozen) return;
 
     const gatesInPath = getGatesInFlightPath();
     activeRunGateIds = new Set(gatesInPath.map(gate => gate.id));
     scoreBoard.startRun(activeRunGateIds.size);
+
+    calculateEndThreshold(gatesInPath);
 
     inFlight = true;
     roundFinished = false;
@@ -755,6 +832,10 @@ function launchRocket() {
 
         checkCollision(prevX, newX, newY);
 
+        const rocketCenterX = newX - WORLD_CENTER;
+        if (!roundFinished && hasReachedEnd(rocketCenterX))
+            finalizeRun();
+
         if (!roundFinished)
             anim = requestAnimationFrame(update);
     }
@@ -773,8 +854,7 @@ function checkCollision(prevX, newX, centerY) {
         rocketY > MAP_SIZE;
 
     if (offMap) {
-        scoreBoard.finalizeRemainingAsMisses();
-        endLaunch("Miss!");
+        finalizeRun();
         return;
     }
 
@@ -803,36 +883,11 @@ function checkCollision(prevX, newX, centerY) {
 
     if (gateProcessed)
         updateGateInfo();
-
-    if (scoreBoard.hasRunGates() && scoreBoard.isRunComplete())
-        endLaunch(scoreBoard.hadRunMisses() ? "Miss!" : "Success!");
 }
-
-// END
-function endLaunch(message) {
-    cancelAnimationFrame(anim);
-    anim = null;
-    inFlight = false;
-    roundFinished = true;
-
-    showPopup(message);
-}
-
-function showPopup(text) {
-    document.getElementById("popupMessage").textContent = text;
-    document.getElementById("popupOverlay").style.display = "flex";
-    popupActive = true;
-}
-
-document.getElementById("popupBtn").onclick = () => {
-    document.getElementById("popupOverlay").style.display = "none";
-    popupActive = false;
-};
 
 // KEYS
 document.addEventListener("keydown", e => {
-    if (popupActive && e.key === "Enter")
-        document.getElementById("popupBtn").click();
+    if (frozen) return;
 
     if (e.key === "ArrowLeft") rotateRocket("left");
     if (e.key === "ArrowRight") rotateRocket("right");

@@ -165,6 +165,10 @@ function drawGates() {
     gateCtx.clearRect(0, 0, MAP_SIZE, MAP_SIZE);
     gateCtx.strokeStyle = "lime";
     gateCtx.lineWidth = 3;
+    gateCtx.fillStyle = "white";
+    gateCtx.font = "14px Arial";
+    gateCtx.textAlign = "left";
+    gateCtx.textBaseline = "middle";
 
     gates.forEach(gate => {
         const x = toScreenX(gate.x);
@@ -174,14 +178,18 @@ function drawGates() {
         const gapBottom = Math.max(y1, y2);
 
         gateCtx.beginPath();
-        gateCtx.moveTo(x, 0);
-        gateCtx.lineTo(x, gapTop);
+        gateCtx.moveTo(x, gapTop);
+        gateCtx.lineTo(x, gapBottom);
         gateCtx.stroke();
 
-        gateCtx.beginPath();
-        gateCtx.moveTo(x, gapBottom);
-        gateCtx.lineTo(x, MAP_SIZE);
-        gateCtx.stroke();
+        if (gate.showCoordinates) {
+            const labelOffset = 8;
+            const topLabel = `( ${gate.x}, ${gate.y1} )`;
+            const bottomLabel = `( ${gate.x}, ${gate.y2} )`;
+
+            gateCtx.fillText(topLabel, x + labelOffset, y1);
+            gateCtx.fillText(bottomLabel, x + labelOffset, y2);
+        }
     });
 }
 
@@ -197,6 +205,8 @@ function renderGateList() {
     }
 
     gates.forEach(gate => {
+        if (gate.showCoordinates === undefined) gate.showCoordinates = false;
+
         const row = document.createElement("div");
         row.className = "gateItem";
 
@@ -246,6 +256,17 @@ function renderGateList() {
             renderGateList();
         };
 
+        const toggleLabel = document.createElement("label");
+        toggleLabel.className = "toggleLabel";
+        const coordsToggle = document.createElement("input");
+        coordsToggle.type = "checkbox";
+        coordsToggle.checked = gate.showCoordinates;
+        coordsToggle.onchange = () => {
+            gate.showCoordinates = coordsToggle.checked;
+            drawGates();
+        };
+        toggleLabel.append(coordsToggle, document.createTextNode(" Show coords"));
+
         row.append(
             document.createTextNode("X:"),
             xInput,
@@ -254,7 +275,8 @@ function renderGateList() {
             document.createTextNode(" Y2:"),
             y2Input,
             saveBtn,
-            removeBtn
+            removeBtn,
+            toggleLabel
         );
 
         gateList.appendChild(row);
@@ -278,7 +300,7 @@ function validateGateValues(x, y1, y2) {
 function addGate(x, y1, y2) {
     if (!validateGateValues(x, y1, y2)) return;
 
-    gates.push({ id: gateIdCounter++, x, y1, y2 });
+    gates.push({ id: gateIdCounter++, x, y1, y2, showCoordinates: false });
     drawGates();
     updateGateInfo();
     renderGateList();

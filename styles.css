@@ -30,6 +30,16 @@ body {
     width: 3000px;
     height: 3000px;
     pointer-events: none;
+    z-index: 2;
+}
+
+#gateCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3000px;
+    height: 3000px;
+    pointer-events: none;
     z-index: 1;
 }
 
@@ -53,13 +63,6 @@ body {
     z-index: 3;
 }
 
-.gate {
-    position: absolute;
-    width: 20px;
-    background: lime;
-    z-index: 2;
-}
-
 /* UI stays normal size (NOT affected by zoom) */
 #topControls {
     position: absolute;
@@ -75,6 +78,59 @@ body {
     border-radius: 10px;
     text-align: center;
 }
+
+#gateControls {
+    position: absolute;
+    top: 160px;
+    left: 25%;
+    transform: translateX(-25%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 15px;
+    border-radius: 10px;
+    min-width: 520px;
+}
+
+#gateControls button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    background: #1e90ff;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#gateList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 220px;
+    overflow: auto;
+}
+
+.gateItem {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 6px 8px;
+    border-radius: 8px;
+}
+
+.gateItem button {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.gateItem .saveBtn { background: #28a745; color: white; }
+.gateItem .removeBtn { background: #c0392b; color: white; }
 
 .controlRow {
     display: flex;

@@ -4,6 +4,8 @@
 const zoomContainer = document.getElementById("zoomContainer");
 const gateControlsPanel = document.getElementById("gateControls");
 const gateList = document.getElementById("gateList");
+const DESIRED_VIEW_RANGE = 60; // Shows -30 to 30 on both axes
+const MAX_ZOOM = 30;
 let zoom = 1;
 let translateX = 0;
 let translateY = 0;
@@ -43,7 +45,7 @@ document.addEventListener("wheel", (e) => {
     const worldY = (pointerY - translateY) / zoom;
 
     zoom = e.deltaY < 0 ? zoom * zoomStep : zoom / zoomStep;
-    zoom = Math.min(Math.max(zoom, 0.2), 3);
+    zoom = Math.min(Math.max(zoom, 0.2), MAX_ZOOM);
 
     translateX = pointerX - worldX * zoom;
     translateY = pointerY - worldY * zoom;
@@ -620,6 +622,7 @@ function resetRocket() {
     setControlsDisabled(false);
     hideResetButton();
 
+    setDefaultView();
     centerGraphOnRocket();
     updateGateInfo();
 }
@@ -722,6 +725,16 @@ addGateBtn.onclick = () => {
 };
 
 resetBtn.onclick = () => resetGame();
+
+// VIEWPORT SETUP
+function setDefaultView() {
+    const targetZoom = Math.min(
+        window.innerWidth / DESIRED_VIEW_RANGE,
+        window.innerHeight / DESIRED_VIEW_RANGE
+    );
+
+    zoom = Math.min(Math.max(targetZoom, 0.2), MAX_ZOOM);
+}
 
 // GRID
 function drawGrid() {

@@ -101,6 +101,8 @@ const quadInput = document.getElementById("quadInput");
 const cubicSlider = document.getElementById("cubicSlider");
 const cubicInput = document.getElementById("cubicInput");
 
+const resetBtn = document.getElementById("resetBtn");
+
 const gateXInput = document.getElementById("gateXInput");
 const gateY1Input = document.getElementById("gateY1Input");
 const gateY2Input = document.getElementById("gateY2Input");
@@ -229,6 +231,20 @@ class ScoreBoard {
             fragment.appendChild(dot);
         }
         container.appendChild(fragment);
+    }
+
+    resetAll() {
+        this.hits = 0;
+        this.misses = 0;
+        this.runTotal = 0;
+        this.runRemaining = 0;
+        this.runStartMisses = 0;
+
+        this.hitDotsEl.innerHTML = "";
+        this.missDotsEl.innerHTML = "";
+
+        this.updateCounts();
+        this.updateRunTotals();
     }
 }
 
@@ -474,6 +490,25 @@ function resetRocket() {
     updateGateInfo();
 }
 
+function resetGame() {
+    resetRocket();
+
+    gateXInput.value = 0;
+    gateY1Input.value = -200;
+    gateY2Input.value = 200;
+
+    gates = [];
+    gateIdCounter = 1;
+    drawGates();
+    renderGateList();
+    updateGateInfo();
+
+    scoreBoard.resetAll();
+
+    document.getElementById("popupOverlay").style.display = "none";
+    popupActive = false;
+}
+
 // BEFORE LAUNCH
 function setRocketFromCenter(v) {
     if (inFlight || popupActive) return;
@@ -550,6 +585,8 @@ addGateBtn.onclick = () => {
 
     addGate(x, y1, y2);
 };
+
+resetBtn.onclick = () => resetGame();
 
 // GRID
 function drawGrid() {
@@ -790,7 +827,6 @@ function showPopup(text) {
 document.getElementById("popupBtn").onclick = () => {
     document.getElementById("popupOverlay").style.display = "none";
     popupActive = false;
-    resetRocket();
 };
 
 // KEYS

@@ -104,6 +104,21 @@ body {
     font-weight: bold;
 }
 
+.secondaryBtn {
+    background: #444;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #666;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease;
+}
+
+.secondaryBtn:hover {
+    background: #555;
+}
+
 #gateList {
     display: flex;
     flex-direction: column;

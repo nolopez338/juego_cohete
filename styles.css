@@ -101,14 +101,25 @@ body {
 }
 
 .panelToggle {
-    background: #222;
+    background: #262626;
     color: #fff;
-    border: 1px solid #555;
-    border-radius: 6px;
-    padding: 4px 10px;
+    border: 1px solid #5f5f5f;
+    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    font-weight: bold;
-    transition: background 0.2s ease, transform 0.1s ease;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.panelToggle:hover {
+    background-color: #333;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
 }
 
 .panelToggle:active {
@@ -217,7 +228,6 @@ body {
     padding: 3px;
 }
 
-#gateInfo,
 #scoreDisplay {
     z-index: 30;
     position: absolute;
@@ -229,14 +239,6 @@ body {
     justify-content: space-between;
     gap: 8px;
     margin-bottom: 4px;
-}
-
-#gateInfo {
-    top: 10px;
-    left: 10px;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 10px 15px;
-    border-radius: 10px;
 }
 
 #scoreDisplay {

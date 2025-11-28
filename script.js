@@ -99,12 +99,7 @@ const gameArea = document.getElementById("gameArea");
 
 const gateSvg = document.getElementById("gateSvg");
 
-const gateXLabel = document.getElementById("gateXLabel");
-const gateTopLabel = document.getElementById("gateTopLabel");
-const gateBottomLabel = document.getElementById("gateBottomLabel");
-
 const topControlsPanel = document.getElementById("topControls");
-const gateInfoPanel = document.getElementById("gateInfo");
 
 const totalGatesLabel = document.getElementById("totalGatesCount");
 const hitsLabel = document.getElementById("hitsCount");
@@ -600,7 +595,6 @@ function renderGateList() {
             gate.y1 = y1;
             gate.y2 = y2;
             drawGates();
-            updateGateInfo();
             renderGateList();
         };
 
@@ -610,7 +604,6 @@ function renderGateList() {
         removeBtn.onclick = () => {
             gates = gates.filter(g => g.id !== gate.id);
             drawGates();
-            updateGateInfo();
             renderGateList();
         };
 
@@ -662,7 +655,6 @@ function addGate(x, y1, y2) {
 
     gates.push({ id: gateIdCounter++, x, y1, y2, showCoordinates: false });
     drawGates();
-    updateGateInfo();
     renderGateList();
 }
 
@@ -678,24 +670,6 @@ function loadSavedLevel(levelIndex) {
     resetRocket();
 }
 
-function getNextGate() {
-    if (!gates.length || rocketX === undefined) return null;
-
-    const rocketCenterX = rocketX + rocket.clientWidth / 2 - WORLD_CENTER;
-    const candidates = gates.filter(gate =>
-        !gatesCrossed.has(gate.id) &&
-        (facing === "right" ? gate.x >= rocketCenterX : gate.x <= rocketCenterX)
-    );
-
-    if (!candidates.length) return null;
-
-    const sorted = [...candidates].sort((a, b) =>
-        facing === "right" ? a.x - b.x : b.x - a.x
-    );
-
-    return sorted[0];
-}
-
 function getGatesInFlightPath() {
     const rocketCenterX = rocketX + rocket.clientWidth / 2 - WORLD_CENTER;
 
@@ -703,21 +677,6 @@ function getGatesInFlightPath() {
         ? gate.x >= rocketCenterX
         : gate.x <= rocketCenterX
     );
-}
-
-function updateGateInfo() {
-    const next = getNextGate();
-
-    if (!next) {
-        gateXLabel.textContent = "–";
-        gateTopLabel.textContent = "–";
-        gateBottomLabel.textContent = "–";
-        return;
-    }
-
-    gateXLabel.textContent = Math.round(next.x);
-    gateTopLabel.textContent = Math.round(next.y1);
-    gateBottomLabel.textContent = Math.round(next.y2);
 }
 
 function setControlsDisabled(disabled) {
@@ -751,7 +710,6 @@ function clearGates() {
     activeRunGateIds = new Set();
     gatesCrossed = new Set();
     drawGates();
-    updateGateInfo();
     renderGateList();
 }
 
@@ -813,7 +771,6 @@ function resetRocket() {
     setDefaultView();
     centerGraphOnRocket();
     updateRocketTransform();
-    updateGateInfo();
 }
 
 function resetGame() {
@@ -924,15 +881,13 @@ function renderSavedLevelButtons() {
 
 makePanelDraggable(topControlsPanel);
 makePanelDraggable(gateControlsPanel);
-makePanelDraggable(gateInfoPanel);
 makePanelDraggable(savedLevelsPanel);
 initializeCollapsible(topControlsPanel);
 initializeCollapsible(gateControlsPanel);
-initializeCollapsible(gateInfoPanel);
 initializeCollapsible(savedLevelsPanel);
 
 window.addEventListener("resize", () => {
-    [topControlsPanel, gateControlsPanel, gateInfoPanel, savedLevelsPanel].forEach(panel => {
+    [topControlsPanel, gateControlsPanel, savedLevelsPanel].forEach(panel => {
         if (!panel || panel.classList.contains("collapsed")) return;
         const body = panel.querySelector(".panelBody");
         if (!body) return;
@@ -1159,7 +1114,6 @@ function rotateRocket(dir) {
     facing = dir;
     rocketAngle = dir === "right" ? 90 : -90;
     updateRocketTransform();
-    updateGateInfo();
 }
 
 function calculateEndThreshold(gatesInPath) {
@@ -1293,8 +1247,6 @@ function checkCollision(prevX, newX, centerY) {
         else     scoreBoard.recordMiss();
     }
 
-    if (gateProcessed)
-        updateGateInfo();
 }
 
 // KEYS

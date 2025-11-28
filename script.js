@@ -203,8 +203,15 @@ const savedLevels = [
     }
 ];
 
-const canvas = document.getElementById("trailCanvas");
-const ctx = canvas.getContext("2d");
+const trailSvg = document.getElementById("trailSvg");
+const trailPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+trailPath.setAttribute("fill", "none");
+trailPath.setAttribute("stroke", "cyan");
+trailPath.setAttribute("stroke-width", "3");
+trailPath.setAttribute("vector-effect", "non-scaling-stroke");
+trailPath.setAttribute("stroke-linecap", "round");
+trailPath.setAttribute("stroke-linejoin", "round");
+trailSvg.appendChild(trailPath);
 
 const MAP_SIZE = 3000;
 const WORLD_CENTER = MAP_SIZE / 2;
@@ -217,8 +224,9 @@ gateSvg.setAttribute("width", MAP_SIZE);
 gateSvg.setAttribute("height", MAP_SIZE);
 gateSvg.setAttribute("viewBox", `0 0 ${MAP_SIZE} ${MAP_SIZE}`);
 
-canvas.width = MAP_SIZE;
-canvas.height = MAP_SIZE;
+trailSvg.setAttribute("width", MAP_SIZE);
+trailSvg.setAttribute("height", MAP_SIZE);
+trailSvg.setAttribute("viewBox", `0 0 ${MAP_SIZE} ${MAP_SIZE}`);
 
 let rocketX, rocketY;
 let rocketSize = parseFloat(rocketSizeSlider.value) || DEFAULT_ROCKET_SIZE;
@@ -237,6 +245,7 @@ updateRocketTransform();
 let anim = null;
 let lastTrailX = null;
 let lastTrailY = null;
+let trailPathData = "";
 let frameCount = 0;
 
 let inFlight = false;
@@ -786,7 +795,8 @@ function resetRocket() {
     facing = "right";
     rocketAngle = 90;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    trailPathData = "";
+    trailPath.setAttribute("d", "");
     lastTrailX = null;
     lastTrailY = null;
 
@@ -1246,12 +1256,12 @@ drawGates();
 
 // TRAIL
 function drawTrail(x1, y1, x2, y2) {
-    ctx.strokeStyle = "cyan";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
+    if (!trailPathData) {
+        trailPathData = `M ${x1} ${y1}`;
+    }
+
+    trailPathData += ` L ${x2} ${y2}`;
+    trailPath.setAttribute("d", trailPathData);
 }
 
 // ROTATION
@@ -1316,6 +1326,9 @@ function launchRocket() {
     roundFinished = false;
     frameCount = 0;
     gatesCrossed = new Set();
+
+    lastTrailX = rocketX + rocket.clientWidth / 2;
+    lastTrailY = rocketY + rocket.clientHeight / 2;
 
     function update() {
 

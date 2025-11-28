@@ -25,7 +25,7 @@ body {
 
 #gridSvg,
 #gateSvg,
-#trailCanvas {
+#trailSvg {
     position: absolute;
     top: 0;
     left: 0;
@@ -42,7 +42,7 @@ body {
     z-index: 1;
 }
 
-#trailCanvas {
+#trailSvg {
     z-index: 2;
 }
 

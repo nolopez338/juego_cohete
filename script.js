@@ -611,18 +611,6 @@ function resetRocket() {
 
 function resetGame() {
     resetRocket();
-
-    gateXInput.value = 0;
-    gateY1Input.value = -200;
-    gateY2Input.value = 200;
-
-    gates = [];
-    gateIdCounter = 1;
-    drawGates();
-    renderGateList();
-    updateGateInfo();
-
-    scoreBoard.resetAll();
 }
 
 // BEFORE LAUNCH

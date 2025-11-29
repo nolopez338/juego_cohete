@@ -920,8 +920,13 @@ function setGateWidth(value) {
     updateGateStrokesForZoom();
 }
 
+function getAxisStrokeWidthForZoom() {
+    return axisStrokeWidth / zoom;
+}
+
 function getTickStrokeWidth() {
-    return Math.max(axisStrokeWidth * 0.75, 0.5);
+    const baseWidth = Math.max(axisStrokeWidth * 0.75, 0.5);
+    return baseWidth / zoom;
 }
 
 function setAxisWidth(value) {
@@ -948,11 +953,13 @@ function armLaunch() {
 function updateAxisStrokeStyles() {
     const axisGroup = gridSvg.querySelector('[data-role="grid-axes"]');
     const tickGroup = gridSvg.querySelector('[data-role="grid-ticks"]');
+    const axisWidth = getAxisStrokeWidthForZoom();
+    const tickWidth = getTickStrokeWidth();
     if (axisGroup) {
-        axisGroup.setAttribute("stroke-width", axisStrokeWidth);
+        axisGroup.setAttribute("stroke-width", axisWidth);
     }
     if (tickGroup) {
-        tickGroup.setAttribute("stroke-width", getTickStrokeWidth());
+        tickGroup.setAttribute("stroke-width", tickWidth);
     }
 }
 
@@ -1746,8 +1753,9 @@ function drawGrid(config, labelFontSize) {
     const axisGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
     axisGroup.dataset.role = "grid-axes";
     axisGroup.setAttribute("stroke", "#555");
-    axisGroup.setAttribute("stroke-width", axisStrokeWidth);
+    axisGroup.setAttribute("stroke-width", getAxisStrokeWidthForZoom());
     axisGroup.setAttribute("shape-rendering", "crispEdges");
+    axisGroup.setAttribute("vector-effect", "non-scaling-stroke");
 
     const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
     yAxis.setAttribute("x1", centerX);
@@ -1772,6 +1780,7 @@ function drawGrid(config, labelFontSize) {
     tickGroup.setAttribute("stroke", "#777");
     tickGroup.setAttribute("stroke-width", getTickStrokeWidth());
     tickGroup.setAttribute("shape-rendering", "crispEdges");
+    tickGroup.setAttribute("vector-effect", "non-scaling-stroke");
 
     const labelGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
     labelGroup.dataset.role = "grid-labels";

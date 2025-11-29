@@ -63,10 +63,18 @@ body {
 }
 
 /* UI stays normal size (NOT affected by zoom) */
-.supermenu {
+.supermenuContainer {
     position: absolute;
     top: 10px;
     left: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    z-index: 20;
+}
+
+.supermenu {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -80,7 +88,6 @@ body {
     max-height: calc(100vh - 20px);
     overflow-y: auto;
     overflow-x: hidden;
-    z-index: 20;
     transition: width 0.25s ease, padding 0.25s ease;
 }
 

@@ -785,10 +785,7 @@ function armLaunch() {
     rocketAngle = 90;
     updateRocketTransform();
 
-    if (startBtn) {
-        startBtn.disabled = true;
-        startBtn.textContent = "Start (Ready)";
-    }
+    launchRocket();
 }
 
 function updateAxisStrokeStyles() {

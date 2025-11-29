@@ -235,7 +235,7 @@ const gridSvg = document.getElementById("gridSvg");
 
 const savedLevels = [
     {
-        name: "Level 1",
+        name: "Nivel 1",
         gates: [
             { x: 1, y1: -5, y2: 5 },
             { x: 2, y1: -100, y2: -10 },
@@ -244,7 +244,7 @@ const savedLevels = [
         ]
     },
     {
-        name: "Level 2",
+        name: "Nivel 2",
         gates: [
             { x: 10, y1: -5, y2: 5 },
             { x: 50, y1: -100, y2: -10 },
@@ -253,7 +253,7 @@ const savedLevels = [
         ]
     },
     {
-        name: "Level 3",
+        name: "Nivel 3",
         gates: [
             { x: 1, y1: -5, y2: 5 },
             { x: 1.25, y1: -5, y2: 5 },
@@ -266,7 +266,7 @@ const savedLevels = [
         ]
     },
     {
-        name: "Level 4 (Harder – More Gates)",
+        name: "Nivel 4",
         gates: [
             { x: 1, y1: -5, y2: 5 },
             { x: 2, y1: -100, y2: -10 },
@@ -277,7 +277,7 @@ const savedLevels = [
         ]
     },
     {
-        name: "Level 5 (Harder)",
+        name: "Nivel 5",
         gates: [
             { x: 10, y1: -5, y2: 5 },
             { x: 20, y1: -20, y2: -10 },
@@ -289,7 +289,7 @@ const savedLevels = [
         ]
     },
     {
-        name: "Level 6 (Hardest)",
+        name: "Nivel 6",
         gates: [
             { x: 1, y1: -5, y2: 5 },
             { x: 1.25, y1: -5, y2: 5 },

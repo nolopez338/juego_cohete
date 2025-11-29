@@ -1051,7 +1051,7 @@ function resetSlidersToDefaults() {
 }
 
 // RESET
-function resetRocket() {
+function resetRocket({ preserveZoom = false } = {}) {
     cancelAnimationFrame(anim);
     anim = null;
 
@@ -1086,7 +1086,8 @@ function resetRocket() {
     setControlsDisabled(false);
     hideResetButton();
 
-    setDefaultView();
+    if (!preserveZoom)
+        setDefaultView();
     centerGraphOnRocket();
     updateRocketTransform();
 }
@@ -1094,7 +1095,7 @@ function resetRocket() {
 function resetGame() {
     scoreBoard.clearLastRunResults();
     undoLastRocketTry();
-    resetRocket();
+    resetRocket({ preserveZoom: true });
 }
 
 function setupRangeLimits({ slider, minInput, maxInput, valueInput, onValueUpdated }) {
@@ -1186,7 +1187,7 @@ function nextIteration() {
     clearGates();
     scoreBoard.resetAll();
     resetSessionStats();
-    resetRocket();
+    resetRocket({ preserveZoom: true });
 }
 
 // BEFORE LAUNCH

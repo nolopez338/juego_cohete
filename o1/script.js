@@ -1199,7 +1199,7 @@ function handleYChange(value) {
     const clamped = clampNumber(value, min, max);
     ySlider.value = clamped;
     yInput.value = clamped;
-    setRocketFromCenter(parseInt(clamped));
+    setRocketFromCenter(parseFloat(clamped));
 }
 
 function handleSlopeChange(value) {

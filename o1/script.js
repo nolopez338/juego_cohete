@@ -204,49 +204,48 @@ const gridSvg = document.getElementById("gridSvg");
 
 const savedLevels = [
     {
-        name: "Level 1",
+        name: "Level 1 – Modo 1a",
         gates: [
-            { x: 10, y1: 20, y2: 50 }
+            { x: 5, y1: 10, y2: 20 }
         ]
     },
     {
-        name: "Level 2",
+        name: "Level 2 – Modo 1b",
         gates: [
-            { x: 5, y1: -10, y2: 0 },
-            { x: 10, y1: 5, y2: 10 }
+            { x: 11, y1: 10, y2: 20 },
+            { x: 22, y1: 19, y2: 31 }
         ]
     },
     {
-        name: "Level 3",
+        name: "Level 3 – Modo 2a",
         gates: [
-            { x: 8, y1: -30, y2: 5 },
-            { x: 16, y1: 15, y2: 45 }
+            { x: 10, y1: 20, y2: 30 },
+            { x: 20, y1: 50, y2: 60 }
         ]
     },
     {
-        name: "Level 4",
+        name: "Level 4 – Modo 2b",
         gates: [
-            { x: 6, y1: -25, y2: 15 },
-            { x: 12, y1: -5, y2: 25 },
-            { x: 18, y1: 30, y2: 70 }
+            { x: 11, y1: 10, y2: 20 },
+            { x: 22, y1: 20, y2: 30 },
+            { x: 33, y1: 30, y2: 40 }
         ]
     },
     {
-        name: "Level 5",
+        name: "Level 5 – Modo 3a",
         gates: [
-            { x: 4, y1: -40, y2: -5 },
-            { x: 10, y1: 0, y2: 35 },
-            { x: 16, y1: 25, y2: 60 },
-            { x: 22, y1: 55, y2: 95 }
+            { x: 10, y1: 10, y2: 20 },
+            { x: 20, y1: 30, y2: 40 },
+            { x: 30, y1: 10, y2: 20 }
         ]
     },
     {
-        name: "Level 6",
+        name: "Level 6 – Modo 4a",
         gates: [
-            { x: 5, y1: -60, y2: -20 },
-            { x: 12, y1: -15, y2: 20 },
-            { x: 18, y1: 10, y2: 45 },
-            { x: 26, y1: 40, y2: 80 }
+            { x: 10, y1: 10, y2: 20 },
+            { x: 20, y1: 30, y2: 40 },
+            { x: 30, y1: 10, y2: 20 },
+            { x: 40, y1: 30, y2: 40 }
         ]
     }
 ];

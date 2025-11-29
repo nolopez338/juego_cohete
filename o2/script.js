@@ -11,6 +11,7 @@ const savedLevelsList = document.getElementById("savedLevelsList");
 const generalConfigPanel = document.getElementById("generalConfigPanel");
 const superMenu = document.getElementById("superMenu");
 const superMenuToggle = document.getElementById("superMenuToggle");
+const collapsedStartBtn = document.getElementById("collapsedStartBtn");
 const DESIRED_VIEW_RANGE = 60; // Shows -30 to 30 on both axes
 const MAX_ZOOM = 30;
 let zoom = 1;
@@ -793,6 +794,10 @@ function setSuperMenuCollapsed(collapsed) {
     superMenuToggle.textContent = collapsed ? "›" : "‹";
     superMenuToggle.setAttribute("aria-expanded", (!collapsed).toString());
 
+    if (collapsedStartBtn) {
+        collapsedStartBtn.classList.toggle("visible", collapsed);
+    }
+
     if (!collapsed) {
         [topControlsPanel, topControlsPanelB, generalConfigPanel, gateControlsPanel, savedLevelsPanel]
             .forEach(refreshPanelBodyHeight);
@@ -1532,6 +1537,10 @@ if (axisWidthSetBtn) {
 
 if (startBtn) {
     startBtn.addEventListener("click", armLaunch);
+}
+
+if (collapsedStartBtn) {
+    collapsedStartBtn.addEventListener("click", armLaunch);
 }
 
 function registerSlider(slider) {

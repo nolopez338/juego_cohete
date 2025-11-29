@@ -10,11 +10,12 @@
 <body>
 
 <!-- UI stays normal size -->
-<div id="superMenu" class="supermenu">
-    <div class="superMenuHeader">
-        <span class="superMenuTitle">Menú</span>
-        <button id="superMenuToggle" class="panelToggle" aria-label="Alternar menú" aria-expanded="true">‹</button>
-    </div>
+<div id="superMenuContainer" class="supermenuContainer">
+    <div id="superMenu" class="supermenu">
+        <div class="superMenuHeader">
+            <span class="superMenuTitle">Menú</span>
+            <button id="superMenuToggle" class="panelToggle" aria-label="Alternar menú" aria-expanded="true">‹</button>
+        </div>
 
     <div id="topPanelRow">
         <div id="generalConfigPanel" class="panel">
@@ -150,6 +151,9 @@
             </div>
         </div>
     </div>
+</div>
+
+    <button id="collapsedStartBtn" class="secondaryBtn collapsedStartBtn" aria-label="Iniciar cuando el menú está minimizado">Iniciar</button>
 </div>
 
 <div id="scoreDisplay">

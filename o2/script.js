@@ -254,7 +254,9 @@ function enhanceRocketTitle(titleEl, sourceRocket, suffix) {
 function getParsedInputValue(inputEl) {
     if (!inputEl) return null;
     const rawValue = inputEl.value;
-    if (rawValue === "" || rawValue === null || rawValue === undefined) {
+    const isIncomplete = rawValue === "" || rawValue === null || rawValue === undefined || rawValue.endsWith(".") || rawValue === "-";
+
+    if (isIncomplete) {
         return null;
     }
 

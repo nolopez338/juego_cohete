@@ -81,28 +81,13 @@
                     <input type="number" id="yMaxInput" class="rangeLimitInput" value="100" step="1">
                 </div>
 
-                <div class="controlRow">
-                    <span>Slope</span>
-                    <input type="number" id="slopeMinInput" class="rangeLimitInput" value="-10" step="0.1">
-                    <input type="range" id="slopeSlider" min="-10" max="10" step="0.1" value="0">
-                    <input type="number" id="slopeInput" class="numInput" min="-10" max="10" step="0.1" value="0">
-                    <input type="number" id="slopeMaxInput" class="rangeLimitInput" value="10" step="0.1">
-                </div>
-
-                <div class="controlRow">
-                    <span>Quad</span>
-                    <input type="number" id="quadMinInput" class="rangeLimitInput" value="-1" step="0.01">
-                    <input type="range" id="quadSlider" min="-1" max="1" step="0.01" value="0">
-                    <input type="number" id="quadInput" class="numInput" min="-1" max="1" step="0.01" value="0">
-                    <input type="number" id="quadMaxInput" class="rangeLimitInput" value="1" step="0.01">
-                </div>
-
-                <div class="controlRow">
-                    <span>Cubic</span>
-                    <input type="number" id="cubicMinInput" class="rangeLimitInput" value="-0.01" step="0.0001">
-                    <input type="range" id="cubicSlider" min="-0.01" max="0.01" step="0.0001" value="0">
-                    <input type="number" id="cubicInput" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
-                    <input type="number" id="cubicMaxInput" class="rangeLimitInput" value="0.01" step="0.0001">
+                <div class="controlRow polynomialRow">
+                    <input type="number" id="slopeInput" class="numInput coefficientInput" min="-10" max="10" step="0.1" value="0">
+                    <span class="polyLabel">x +</span>
+                    <input type="number" id="quadInput" class="numInput coefficientInput" min="-1" max="1" step="0.01" value="0">
+                    <span class="polyLabel">x² +</span>
+                    <input type="number" id="cubicInput" class="numInput coefficientInput" min="-0.01" max="0.01" step="0.0001" value="0">
+                    <span class="polyLabel">x³</span>
                 </div>
             </div>
         </div>
@@ -121,28 +106,13 @@
                     <input type="number" id="yMaxInputB" class="rangeLimitInput" value="100" step="1">
                 </div>
 
-                <div class="controlRow">
-                    <span>Slope</span>
-                    <input type="number" id="slopeMinInputB" class="rangeLimitInput" value="-10" step="0.1">
-                    <input type="range" id="slopeSliderB" min="-10" max="10" step="0.1" value="0">
-                    <input type="number" id="slopeInputB" class="numInput" min="-10" max="10" step="0.1" value="0">
-                    <input type="number" id="slopeMaxInputB" class="rangeLimitInput" value="10" step="0.1">
-                </div>
-
-                <div class="controlRow">
-                    <span>Quad</span>
-                    <input type="number" id="quadMinInputB" class="rangeLimitInput" value="-1" step="0.01">
-                    <input type="range" id="quadSliderB" min="-1" max="1" step="0.01" value="0">
-                    <input type="number" id="quadInputB" class="numInput" min="-1" max="1" step="0.01" value="0">
-                    <input type="number" id="quadMaxInputB" class="rangeLimitInput" value="1" step="0.01">
-                </div>
-
-                <div class="controlRow">
-                    <span>Cubic</span>
-                    <input type="number" id="cubicMinInputB" class="rangeLimitInput" value="-0.01" step="0.0001">
-                    <input type="range" id="cubicSliderB" min="-0.01" max="0.01" step="0.0001" value="0">
-                    <input type="number" id="cubicInputB" class="numInput" min="-0.01" max="0.01" step="0.0001" value="0">
-                    <input type="number" id="cubicMaxInputB" class="rangeLimitInput" value="0.01" step="0.0001">
+                <div class="controlRow polynomialRow">
+                    <input type="number" id="slopeInputB" class="numInput coefficientInput" min="-10" max="10" step="0.1" value="0">
+                    <span class="polyLabel">x +</span>
+                    <input type="number" id="quadInputB" class="numInput coefficientInput" min="-1" max="1" step="0.01" value="0">
+                    <span class="polyLabel">x² +</span>
+                    <input type="number" id="cubicInputB" class="numInput coefficientInput" min="-0.01" max="0.01" step="0.0001" value="0">
+                    <span class="polyLabel">x³</span>
                 </div>
             </div>
         </div>

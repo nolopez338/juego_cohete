@@ -295,6 +295,7 @@ let gateWidthLocked = false;
 let gateBaseStrokeWidth = parseFloat(gateWidthSlider?.value) || sliderDefaults.gateWidth;
 let axisWidthLocked = false;
 let axisStrokeWidth = parseFloat(axisWidthSlider?.value) || sliderDefaults.axisWidth;
+let baseY = parseFloat(ySlider?.value) || 0;
 let slope = 0;
 let quad = 0;
 let cubic = 0;
@@ -314,7 +315,6 @@ let anim = null;
 let lastTrailX = null;
 let lastTrailY = null;
 let trailPathData = "";
-let frameCount = 0;
 
 let inFlight = false;
 let roundFinished = false;
@@ -695,6 +695,13 @@ function convertScreenToCenter(y) {
     return -(y + rocket.clientHeight / 2 - WORLD_CENTER);
 }
 
+function getTrajectoryY(base, slopeCoeff, quadCoeff, cubicCoeff, centerX) {
+    return base
+        + slopeCoeff * centerX
+        + quadCoeff * centerX * centerX
+        + cubicCoeff * centerX * centerX * centerX;
+}
+
 function toScreenX(value) {
     return WORLD_CENTER + value;
 }
@@ -1065,8 +1072,6 @@ function resetRocket() {
     rocket.style.left = rocketX + "px";
     rocket.style.top  = rocketY + "px";
 
-    frameCount = 0;
-
     frozen = false;
     endThresholdX = null;
     lastGateTargetX = null;
@@ -1200,6 +1205,7 @@ function handleYChange(value) {
     const clamped = clampNumber(value, min, max);
     ySlider.value = clamped;
     yInput.value = clamped;
+    baseY = clamped;
     setRocketFromCenter(parseFloat(clamped));
 }
 
@@ -1680,7 +1686,6 @@ function launchRocket() {
 
     inFlight = true;
     roundFinished = false;
-    frameCount = 0;
     gatesCrossed = new Set();
 
     lastTrailX = rocketX + rocket.clientWidth / 2;
@@ -1693,11 +1698,9 @@ function launchRocket() {
 
         rocketX += (facing === "right" ? speed : -speed);
 
-        rocketY -= slope;
-        rocketY -= quad  * frameCount * frameCount;
-        rocketY -= cubic * frameCount * frameCount * frameCount;
-
-        frameCount++;
+        const centerX = rocketX + rocket.clientWidth / 2 - WORLD_CENTER;
+        const centerY = getTrajectoryY(baseY, slope, quad, cubic, centerX);
+        rocketY = convertCenterToScreen(centerY);
 
         rocket.style.left = rocketX + "px";
         rocket.style.top  = rocketY + "px";

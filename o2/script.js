@@ -394,6 +394,8 @@ let gateWidthLocked = false;
 let gateBaseStrokeWidth = parseFloat(gateWidthSlider?.value) || sliderDefaults.gateWidth;
 let axisWidthLocked = false;
 let axisStrokeWidth = parseFloat(axisWidthSlider?.value) || sliderDefaults.axisWidth;
+let baseY = parseFloat(ySlider?.value) || 0;
+let baseYB = parseFloat(ySliderB?.value) || 0;
 let slope = 0;
 let quad = 0;
 let cubic = 0;
@@ -426,7 +428,6 @@ let lastDiffY = null;
 let trailPathData = "";
 let trailPathDataB = "";
 let diffTrailPathData = "";
-let frameCount = 0;
 
 let inFlight = false;
 let roundFinished = false;
@@ -813,6 +814,13 @@ function toScreenX(value) {
 
 function toScreenY(value) {
     return WORLD_CENTER - value;
+}
+
+function getTrajectoryY(base, slopeCoeff, quadCoeff, cubicCoeff, centerX) {
+    return base
+        + slopeCoeff * centerX
+        + quadCoeff * centerX * centerX
+        + cubicCoeff * centerX * centerX * centerX;
 }
 
 function updateRocketTransform() {
@@ -1239,8 +1247,6 @@ function resetRocket() {
     rocketB.style.left = rocketXB + "px";
     rocketB.style.top  = rocketYB + "px";
 
-    frameCount = 0;
-
     frozen = false;
     endThresholdX = null;
     lastGateTargetX = null;
@@ -1380,6 +1386,7 @@ function handleYChange(value) {
     const clamped = clampNumber(value, min, max);
     ySlider.value = clamped;
     yInput.value = clamped;
+    baseY = clamped;
     setRocketFromCenter(parseFloat(clamped));
 }
 
@@ -1391,6 +1398,7 @@ function handleYChangeB(value) {
     const clamped = clampNumber(value, min, max);
     ySliderB.value = clamped;
     yInputB.value = clamped;
+    baseYB = clamped;
     setRocketFromCenterB(parseFloat(clamped));
 }
 
@@ -1915,7 +1923,6 @@ function launchRocket() {
 
     inFlight = true;
     roundFinished = false;
-    frameCount = 0;
     gatesCrossed = new Set();
 
     lastTrailX = rocketX + rocket.clientWidth / 2;
@@ -1939,15 +1946,14 @@ function launchRocket() {
         rocketX += (facing === "right" ? speed : -speed);
         rocketXB += (facing === "right" ? speed : -speed);
 
-        rocketY -= slope;
-        rocketY -= quad  * frameCount * frameCount;
-        rocketY -= cubic * frameCount * frameCount * frameCount;
+        const centerX = rocketX + rocket.clientWidth / 2 - WORLD_CENTER;
+        const centerXB = rocketXB + rocketB.clientWidth / 2 - WORLD_CENTER;
 
-        rocketYB -= slopeB;
-        rocketYB -= quadB * frameCount * frameCount;
-        rocketYB -= cubicB * frameCount * frameCount * frameCount;
+        const centerY = getTrajectoryY(baseY, slope, quad, cubic, centerX);
+        const centerYB = getTrajectoryY(baseYB, slopeB, quadB, cubicB, centerXB);
 
-        frameCount++;
+        rocketY = convertCenterToScreen(centerY);
+        rocketYB = convertCenterToScreen(centerYB);
 
         rocket.style.left = rocketX + "px";
         rocket.style.top  = rocketY + "px";

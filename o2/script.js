@@ -115,6 +115,8 @@ const gateSvg = document.getElementById("gateSvg");
 
 const topControlsPanel = document.getElementById("topControls");
 const topControlsPanelB = document.getElementById("topControlsB");
+const rocketATitle = document.getElementById("rocketATitle");
+const rocketBTitle = document.getElementById("rocketBTitle");
 
 const totalGatesLabel = document.getElementById("totalGatesCount");
 const hitsLabel = document.getElementById("hitsCount");
@@ -205,6 +207,48 @@ function clampToInputBounds(value, inputEl) {
     }
 
     return clamped;
+}
+
+function createRocketTitleIcon(sourceRocket, suffix) {
+    if (!sourceRocket) return null;
+
+    const svg = sourceRocket.querySelector("svg");
+    if (!svg) return null;
+
+    const clone = svg.cloneNode(true);
+    const gradient = clone.querySelector("linearGradient");
+
+    if (gradient?.id) {
+        const originalId = gradient.id;
+        const uniqueId = `${originalId}-${suffix}`;
+        gradient.id = uniqueId;
+
+        clone.querySelectorAll(`[fill="url(#${originalId})"]`)?.forEach(path => {
+            path.setAttribute("fill", `url(#${uniqueId})`);
+        });
+    }
+
+    clone.classList.add("rocketIconMini");
+    return clone;
+}
+
+function enhanceRocketTitle(titleEl, sourceRocket, suffix) {
+    if (!titleEl || !sourceRocket) return;
+
+    const text = titleEl.textContent.trim();
+    titleEl.textContent = "";
+
+    const iconWrapper = document.createElement("span");
+    iconWrapper.className = "rocketTitleIcon";
+
+    const icon = createRocketTitleIcon(sourceRocket, suffix);
+    if (icon) iconWrapper.appendChild(icon);
+
+    titleEl.appendChild(iconWrapper);
+
+    const textNode = document.createElement("span");
+    textNode.textContent = text;
+    titleEl.appendChild(textNode);
 }
 
 function getParsedInputValue(inputEl) {
@@ -367,6 +411,8 @@ setAxisWidth(axisStrokeWidth);
 toggleDifferencePathVisibility();
 updateRocketSizeControls();
 updateRocketTransform();
+enhanceRocketTitle(rocketATitle, rocket, "titleA");
+enhanceRocketTitle(rocketBTitle, rocketB, "titleB");
 
 let anim = null;
 let lastTrailX = null;

@@ -155,6 +155,24 @@ body {
     user-select: none;
 }
 
+.panelTitle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.rocketTitleIcon {
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+}
+
+.rocketTitleIcon .rocketIconMini {
+    width: 100%;
+    height: 100%;
+}
+
 .panelToggle {
     background: #262626;
     color: #fff;

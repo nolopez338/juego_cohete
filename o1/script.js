@@ -250,6 +250,8 @@ const savedLevels = [
     }
 ];
 
+let selectedSavedLevelIndex = null;
+
 const trailSvg = document.getElementById("trailSvg");
 const trailPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
 trailPath.setAttribute("fill", "none");
@@ -955,6 +957,8 @@ function loadSavedLevel(levelIndex) {
     const level = savedLevels[levelIndex];
     if (!level) return;
 
+    selectedSavedLevelIndex = levelIndex;
+
     clearGates();
     level.gates.forEach(gate => addGate(gate.x, gate.y1, gate.y2));
 
@@ -1388,6 +1392,21 @@ resetBtn.onclick = () => resetGame();
 restartBtn.onclick = () => nextIteration();
 nextBtn.onclick = () => {
     recordGateConfigurationForStats();
+    const isSavedLevelSelected = Number.isInteger(selectedSavedLevelIndex);
+
+    if (isSavedLevelSelected) {
+        const nextLevelIndex = selectedSavedLevelIndex + 1;
+        const hasNextLevel = nextLevelIndex < savedLevels.length;
+
+        if (hasNextLevel) {
+            loadSavedLevel(nextLevelIndex);
+        } else {
+            downloadStatsPdf();
+        }
+
+        return;
+    }
+
     nextRun();
 };
 if (downloadStatsBtn) {

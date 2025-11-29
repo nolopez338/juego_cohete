@@ -961,7 +961,7 @@ function drawGates() {
     labelGroup.setAttribute("fill", "white");
     labelGroup.setAttribute("font-size", labelFontSize);
     labelGroup.setAttribute("font-family", "Arial, sans-serif");
-    labelGroup.setAttribute("text-anchor", "start");
+    labelGroup.setAttribute("text-anchor", "middle");
     labelGroup.setAttribute("dominant-baseline", "middle");
 
     gates.forEach(gate => {
@@ -980,16 +980,15 @@ function drawGates() {
         lineGroup.appendChild(line);
 
         if (gate.showCoordinates) {
-            const labelOffset = 8;
             const topLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
             topLabel.dataset.role = "gate-label";
-            topLabel.setAttribute("x", x + labelOffset);
+            topLabel.setAttribute("x", x);
             topLabel.setAttribute("y", y1);
             topLabel.textContent = `( ${gate.x}, ${gate.y1} )`;
 
             const bottomLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
             bottomLabel.dataset.role = "gate-label";
-            bottomLabel.setAttribute("x", x + labelOffset);
+            bottomLabel.setAttribute("x", x);
             bottomLabel.setAttribute("y", y2);
             bottomLabel.textContent = `( ${gate.x}, ${gate.y2} )`;
 

@@ -1193,16 +1193,6 @@ function resetSlidersToDefaults() {
     handleSlopeChangeB(sliderDefaults.slopeB);
     handleQuadChangeB(sliderDefaults.quadB);
     handleCubicChangeB(sliderDefaults.cubicB);
-
-    setTrailWidth(sliderDefaults.trailWidth);
-    setRocketSize(sliderDefaults.rocketSize);
-    setGateWidth(sliderDefaults.gateWidth);
-    setAxisWidth(sliderDefaults.axisWidth);
-
-    if (differenceToggle) {
-        differenceToggle.checked = sliderDefaults.showDifference;
-        toggleDifferencePathVisibility();
-    }
 }
 
 // RESET

@@ -1043,11 +1043,6 @@ function resetSlidersToDefaults() {
     handleSlopeChange(sliderDefaults.slope);
     handleQuadChange(sliderDefaults.quad);
     handleCubicChange(sliderDefaults.cubic);
-
-    setTrailWidth(sliderDefaults.trailWidth);
-    setRocketSize(sliderDefaults.rocketSize);
-    setGateWidth(sliderDefaults.gateWidth);
-    setAxisWidth(sliderDefaults.axisWidth);
 }
 
 // RESET

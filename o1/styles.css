@@ -261,6 +261,19 @@ body {
     flex-wrap: wrap;
 }
 
+.polynomialRow {
+    flex-wrap: nowrap;
+    gap: 8px;
+}
+
+.coefficientInput {
+    width: 70px;
+}
+
+.polyLabel {
+    white-space: nowrap;
+}
+
 .controlRow input[type="range"] {
     width: 150px;
 }

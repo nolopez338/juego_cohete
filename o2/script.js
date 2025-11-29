@@ -126,41 +126,23 @@ const yMinInput = document.getElementById("yMinInput");
 const ySlider = document.getElementById("ySlider");
 const yInput = document.getElementById("yInput");
 
-const slopeMinInput = document.getElementById("slopeMinInput");
-const slopeSlider = document.getElementById("slopeSlider");
 const slopeInput = document.getElementById("slopeInput");
 
 const yMinInputB = document.getElementById("yMinInputB");
 const ySliderB = document.getElementById("ySliderB");
 const yInputB = document.getElementById("yInputB");
 
-const slopeMinInputB = document.getElementById("slopeMinInputB");
-const slopeSliderB = document.getElementById("slopeSliderB");
 const slopeInputB = document.getElementById("slopeInputB");
 
-const quadMinInput = document.getElementById("quadMinInput");
-const quadSlider = document.getElementById("quadSlider");
 const quadInput = document.getElementById("quadInput");
 
-const quadMinInputB = document.getElementById("quadMinInputB");
-const quadSliderB = document.getElementById("quadSliderB");
 const quadInputB = document.getElementById("quadInputB");
 
-const cubicMinInput = document.getElementById("cubicMinInput");
-const cubicSlider = document.getElementById("cubicSlider");
 const cubicInput = document.getElementById("cubicInput");
 const yMaxInput = document.getElementById("yMaxInput");
-const slopeMaxInput = document.getElementById("slopeMaxInput");
-const quadMaxInput = document.getElementById("quadMaxInput");
-const cubicMaxInput = document.getElementById("cubicMaxInput");
 
-const cubicMinInputB = document.getElementById("cubicMinInputB");
-const cubicSliderB = document.getElementById("cubicSliderB");
 const cubicInputB = document.getElementById("cubicInputB");
 const yMaxInputB = document.getElementById("yMaxInputB");
-const slopeMaxInputB = document.getElementById("slopeMaxInputB");
-const quadMaxInputB = document.getElementById("quadMaxInputB");
-const cubicMaxInputB = document.getElementById("cubicMaxInputB");
 
 const differenceToggle = document.getElementById("differenceToggle");
 
@@ -187,13 +169,13 @@ const downloadStatsBtn = document.getElementById("downloadStatsBtn");
 
 const sliderDefaults = {
     y: parseFloat(ySlider.defaultValue),
-    slope: parseFloat(slopeSlider.defaultValue),
-    quad: parseFloat(quadSlider.defaultValue),
-    cubic: parseFloat(cubicSlider.defaultValue),
+    slope: parseFloat(slopeInput?.defaultValue) || 0,
+    quad: parseFloat(quadInput?.defaultValue) || 0,
+    cubic: parseFloat(cubicInput?.defaultValue) || 0,
     yB: parseFloat(ySliderB.defaultValue),
-    slopeB: parseFloat(slopeSliderB.defaultValue),
-    quadB: parseFloat(quadSliderB.defaultValue),
-    cubicB: parseFloat(cubicSliderB.defaultValue),
+    slopeB: parseFloat(slopeInputB?.defaultValue) || 0,
+    quadB: parseFloat(quadInputB?.defaultValue) || 0,
+    cubicB: parseFloat(cubicInputB?.defaultValue) || 0,
     rocketSize: parseFloat(rocketSizeSlider.defaultValue) || DEFAULT_ROCKET_SIZE,
     trailWidth: parseFloat(trailWidthSlider?.defaultValue) || 3,
     gateWidth: parseFloat(gateWidthSlider?.defaultValue) || 3,
@@ -204,6 +186,24 @@ const sliderDefaults = {
 function clampNumber(value, min, max) {
     if (!Number.isFinite(value)) return min;
     return Math.min(Math.max(value, min), max);
+}
+
+function clampToInputBounds(value, inputEl) {
+    if (!inputEl) return value;
+
+    let clamped = value;
+    const minVal = parseFloat(inputEl.min);
+    const maxVal = parseFloat(inputEl.max);
+
+    if (Number.isFinite(minVal)) {
+        clamped = Math.max(clamped, minVal);
+    }
+
+    if (Number.isFinite(maxVal)) {
+        clamped = Math.min(clamped, maxVal);
+    }
+
+    return clamped;
 }
 
 function getParsedInputValue(inputEl) {
@@ -1057,13 +1057,9 @@ function getGatesInFlightPath() {
 function setControlsDisabled(disabled) {
     const elements = [
         yMinInput, ySlider, yInput, yMaxInput,
-        slopeMinInput, slopeSlider, slopeInput, slopeMaxInput,
-        quadMinInput, quadSlider, quadInput, quadMaxInput,
-        cubicMinInput, cubicSlider, cubicInput, cubicMaxInput,
+        slopeInput, quadInput, cubicInput,
         yMinInputB, ySliderB, yInputB, yMaxInputB,
-        slopeMinInputB, slopeSliderB, slopeInputB, slopeMaxInputB,
-        quadMinInputB, quadSliderB, quadInputB, quadMaxInputB,
-        cubicMinInputB, cubicSliderB, cubicInputB, cubicMaxInputB,
+        slopeInputB, quadInputB, cubicInputB,
         gateXInput, gateY1Input, gateY2Input,
         addGateBtn,
         differenceToggle
@@ -1320,10 +1316,7 @@ function handleYChangeB(value) {
 function handleSlopeChange(value) {
     if (!Number.isFinite(value)) return;
 
-    const min = parseFloat(slopeSlider.min);
-    const max = parseFloat(slopeSlider.max);
-    const clamped = clampNumber(value, min, max);
-    slopeSlider.value = clamped;
+    const clamped = clampToInputBounds(value, slopeInput);
     slopeInput.value = clamped;
     slope = clamped;
 }
@@ -1331,10 +1324,7 @@ function handleSlopeChange(value) {
 function handleSlopeChangeB(value) {
     if (!Number.isFinite(value)) return;
 
-    const min = parseFloat(slopeSliderB.min);
-    const max = parseFloat(slopeSliderB.max);
-    const clamped = clampNumber(value, min, max);
-    slopeSliderB.value = clamped;
+    const clamped = clampToInputBounds(value, slopeInputB);
     slopeInputB.value = clamped;
     slopeB = clamped;
 }
@@ -1342,10 +1332,7 @@ function handleSlopeChangeB(value) {
 function handleQuadChange(value) {
     if (!Number.isFinite(value)) return;
 
-    const min = parseFloat(quadSlider.min);
-    const max = parseFloat(quadSlider.max);
-    const clamped = clampNumber(value, min, max);
-    quadSlider.value = clamped;
+    const clamped = clampToInputBounds(value, quadInput);
     quadInput.value = clamped;
     quad = clamped;
 }
@@ -1353,10 +1340,7 @@ function handleQuadChange(value) {
 function handleQuadChangeB(value) {
     if (!Number.isFinite(value)) return;
 
-    const min = parseFloat(quadSliderB.min);
-    const max = parseFloat(quadSliderB.max);
-    const clamped = clampNumber(value, min, max);
-    quadSliderB.value = clamped;
+    const clamped = clampToInputBounds(value, quadInputB);
     quadInputB.value = clamped;
     quadB = clamped;
 }
@@ -1364,10 +1348,7 @@ function handleQuadChangeB(value) {
 function handleCubicChange(value) {
     if (!Number.isFinite(value)) return;
 
-    const min = parseFloat(cubicSlider.min);
-    const max = parseFloat(cubicSlider.max);
-    const clamped = clampNumber(value, min, max);
-    cubicSlider.value = clamped;
+    const clamped = clampToInputBounds(value, cubicInput);
     cubicInput.value = clamped;
     cubic = clamped;
 }
@@ -1375,36 +1356,23 @@ function handleCubicChange(value) {
 function handleCubicChangeB(value) {
     if (!Number.isFinite(value)) return;
 
-    const min = parseFloat(cubicSliderB.min);
-    const max = parseFloat(cubicSliderB.max);
-    const clamped = clampNumber(value, min, max);
-    cubicSliderB.value = clamped;
+    const clamped = clampToInputBounds(value, cubicInputB);
     cubicInputB.value = clamped;
     cubicB = clamped;
 }
 
 ySlider.oninput = () => handleYChange(parseFloat(ySlider.value));
-onNumberInput(yInput, handleYChange);
-
 ySliderB.oninput = () => handleYChangeB(parseFloat(ySliderB.value));
+onNumberInput(yInput, handleYChange);
 onNumberInput(yInputB, handleYChangeB);
 
-slopeSlider.oninput = () => handleSlopeChange(parseFloat(slopeSlider.value));
 onNumberInput(slopeInput, handleSlopeChange);
-
-slopeSliderB.oninput = () => handleSlopeChangeB(parseFloat(slopeSliderB.value));
 onNumberInput(slopeInputB, handleSlopeChangeB);
 
-quadSlider.oninput = () => handleQuadChange(parseFloat(quadSlider.value));
 onNumberInput(quadInput, handleQuadChange);
-
-quadSliderB.oninput = () => handleQuadChangeB(parseFloat(quadSliderB.value));
 onNumberInput(quadInputB, handleQuadChangeB);
 
-cubicSlider.oninput = () => handleCubicChange(parseFloat(cubicSlider.value));
 onNumberInput(cubicInput, handleCubicChange);
-
-cubicSliderB.oninput = () => handleCubicChangeB(parseFloat(cubicSliderB.value));
 onNumberInput(cubicInputB, handleCubicChangeB);
 
 setupRangeLimits({
@@ -1416,59 +1384,11 @@ setupRangeLimits({
 });
 
 setupRangeLimits({
-    slider: slopeSlider,
-    minInput: slopeMinInput,
-    maxInput: slopeMaxInput,
-    valueInput: slopeInput,
-    onValueUpdated: handleSlopeChange,
-});
-
-setupRangeLimits({
-    slider: quadSlider,
-    minInput: quadMinInput,
-    maxInput: quadMaxInput,
-    valueInput: quadInput,
-    onValueUpdated: handleQuadChange,
-});
-
-setupRangeLimits({
-    slider: cubicSlider,
-    minInput: cubicMinInput,
-    maxInput: cubicMaxInput,
-    valueInput: cubicInput,
-    onValueUpdated: handleCubicChange,
-});
-
-setupRangeLimits({
     slider: ySliderB,
     minInput: yMinInputB,
     maxInput: yMaxInputB,
     valueInput: yInputB,
     onValueUpdated: handleYChangeB,
-});
-
-setupRangeLimits({
-    slider: slopeSliderB,
-    minInput: slopeMinInputB,
-    maxInput: slopeMaxInputB,
-    valueInput: slopeInputB,
-    onValueUpdated: handleSlopeChangeB,
-});
-
-setupRangeLimits({
-    slider: quadSliderB,
-    minInput: quadMinInputB,
-    maxInput: quadMaxInputB,
-    valueInput: quadInputB,
-    onValueUpdated: handleQuadChangeB,
-});
-
-setupRangeLimits({
-    slider: cubicSliderB,
-    minInput: cubicMinInputB,
-    maxInput: cubicMaxInputB,
-    valueInput: cubicInputB,
-    onValueUpdated: handleCubicChangeB,
 });
 
 rocketSizeSlider.oninput = () => {
@@ -1544,13 +1464,7 @@ function registerSlider(slider) {
 }
 
 registerSlider(ySlider);
-registerSlider(slopeSlider);
-registerSlider(quadSlider);
-registerSlider(cubicSlider);
 registerSlider(ySliderB);
-registerSlider(slopeSliderB);
-registerSlider(quadSliderB);
-registerSlider(cubicSliderB);
 registerSlider(rocketSizeSlider);
 registerSlider(trailWidthSlider);
 registerSlider(gateWidthSlider);

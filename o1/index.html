@@ -71,18 +71,18 @@
             <div class="panelBody">
                 <div class="controlRow">
                     <span>Posición Y</span>
-                    <input type="number" id="yMinInput" class="rangeLimitInput" value="-100" step="1">
+                    <input type="number" id="yMinInput" class="rangeLimitInput" value="-100" step="any">
                     <input type="range" id="ySlider" min="-100" max="100" value="0">
-                    <input type="number" id="yInput" class="numInput" min="-100" max="100" value="0">
-                    <input type="number" id="yMaxInput" class="rangeLimitInput" value="100" step="1">
+                    <input type="number" id="yInput" class="numInput" min="-100" max="100" value="0" step="any">
+                    <input type="number" id="yMaxInput" class="rangeLimitInput" value="100" step="any">
                 </div>
 
                 <div class="controlRow polynomialRow">
-                    <input type="number" id="slopeInput" class="numInput coefficientInput" step="0.1" value="0">
+                    <input type="number" id="slopeInput" class="numInput coefficientInput" step="any" value="0">
                     <span class="polyLabel">x +</span>
-                    <input type="number" id="quadInput" class="numInput coefficientInput" step="0.01" value="0">
+                    <input type="number" id="quadInput" class="numInput coefficientInput" step="any" value="0">
                     <span class="polyLabel">x² +</span>
-                    <input type="number" id="cubicInput" class="numInput coefficientInput" step="0.0001" value="0">
+                    <input type="number" id="cubicInput" class="numInput coefficientInput" step="any" value="0">
                     <span class="polyLabel">x³</span>
                 </div>
             </div>
@@ -96,11 +96,11 @@
             <div class="panelBody">
                 <div class="controlRow">
                     <span>X</span>
-                    <input type="number" id="gateXInput" class="numInput" value="0" step="50">
+                    <input type="number" id="gateXInput" class="numInput" value="0" step="any">
                     <span>Y1</span>
-                    <input type="number" id="gateY1Input" class="numInput" value="-200" step="50">
+                    <input type="number" id="gateY1Input" class="numInput" value="-200" step="any">
                     <span>Y2</span>
-                    <input type="number" id="gateY2Input" class="numInput" value="200" step="50">
+                    <input type="number" id="gateY2Input" class="numInput" value="200" step="any">
                     <button id="addGateBtn">Agregar puerta</button>
                 </div>
                 <div id="gateList"></div>

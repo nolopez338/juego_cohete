@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rocket Gate Game</title>
+    <title>Juego de puertas de cohetes</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -12,65 +12,65 @@
 <!-- UI stays normal size -->
 <div id="superMenu" class="supermenu">
     <div class="superMenuHeader">
-        <span class="superMenuTitle">Menu</span>
-        <button id="superMenuToggle" class="panelToggle" aria-label="Toggle menu" aria-expanded="true">‹</button>
+        <span class="superMenuTitle">Menú</span>
+        <button id="superMenuToggle" class="panelToggle" aria-label="Alternar menú" aria-expanded="true">‹</button>
     </div>
 
     <div id="topPanelRow">
         <div id="generalConfigPanel" class="panel">
             <div class="panelHeader">
-                <span>General Configuration</span>
-                <button class="panelToggle" data-target="generalConfigPanel" aria-label="Toggle general configuration panel">−</button>
+                <span>Configuración general</span>
+                <button class="panelToggle" data-target="generalConfigPanel" aria-label="Alternar panel de configuración general">−</button>
             </div>
             <div class="panelBody">
                 <div class="controlRow">
-                    <span id="rocketSizeLabel">Rocket Size</span>
+                    <span id="rocketSizeLabel">Tamaño del cohete</span>
                     <input type="range" id="rocketSizeSlider" min="0.5" max="2" step="0.05" value="1">
-                    <button id="rocketSizeSetBtn" class="secondaryBtn">Set</button>
+                    <button id="rocketSizeSetBtn" class="secondaryBtn">Fijar</button>
                 </div>
 
                 <div class="controlRow">
-                    <button id="startBtn" class="secondaryBtn">Start</button>
+                    <button id="startBtn" class="secondaryBtn">Iniciar</button>
                 </div>
 
                 <div class="controlRow">
-                    <span id="trailWidthLabel">Trajectory Width</span>
+                    <span id="trailWidthLabel">Ancho de trayectoria</span>
                     <input type="range" id="trailWidthSlider" min="1" max="10" step="0.5" value="3">
-                    <button id="trailWidthSetBtn" class="secondaryBtn">Set</button>
+                    <button id="trailWidthSetBtn" class="secondaryBtn">Fijar</button>
                 </div>
 
                 <div class="controlRow">
-                    <span id="gateWidthLabel">Gate Width</span>
+                    <span id="gateWidthLabel">Ancho de la puerta</span>
                     <input type="range" id="gateWidthSlider" min="1" max="10" step="0.5" value="3">
-                    <button id="gateWidthSetBtn" class="secondaryBtn">Set</button>
+                    <button id="gateWidthSetBtn" class="secondaryBtn">Fijar</button>
                 </div>
 
                 <div class="controlRow">
-                    <span id="axisWidthLabel">XY-Axis Width</span>
+                    <span id="axisWidthLabel">Ancho de ejes XY</span>
                     <input type="range" id="axisWidthSlider" min="0.5" max="6" step="0.1" value="2">
-                    <button id="axisWidthSetBtn" class="secondaryBtn">Set</button>
+                    <button id="axisWidthSetBtn" class="secondaryBtn">Fijar</button>
                 </div>
 
                 <div class="controlRow">
-                    <button id="resetBtn" class="secondaryBtn">Reset</button>
-                    <button id="restartBtn" class="secondaryBtn">Restart</button>
-                    <button id="nextBtn" class="secondaryBtn">Next</button>
+                    <button id="resetBtn" class="secondaryBtn">Restablecer</button>
+                    <button id="restartBtn" class="secondaryBtn">Reiniciar</button>
+                    <button id="nextBtn" class="secondaryBtn">Siguiente</button>
                 </div>
 
                 <div class="controlRow">
-                    <button id="downloadStatsBtn" class="secondaryBtn">Download Stats PDF</button>
+                    <button id="downloadStatsBtn" class="secondaryBtn">Descargar estadísticas (PDF)</button>
                 </div>
             </div>
         </div>
 
         <div id="topControls" class="panel">
             <div class="panelHeader">
-                <span>Rocket Sliders</span>
-                <button class="panelToggle" data-target="topControls" aria-label="Toggle slider panel">−</button>
+                <span>Controles del cohete</span>
+                <button class="panelToggle" data-target="topControls" aria-label="Alternar panel de controles">−</button>
             </div>
             <div class="panelBody">
                 <div class="controlRow">
-                    <span>Y pos</span>
+                    <span>Posición Y</span>
                     <input type="number" id="yMinInput" class="rangeLimitInput" value="-100" step="1">
                     <input type="range" id="ySlider" min="-100" max="100" value="0">
                     <input type="number" id="yInput" class="numInput" min="-100" max="100" value="0">
@@ -90,8 +90,8 @@
 
         <div id="gateControls" class="panel">
             <div class="panelHeader">
-                <span>Gates</span>
-                <button class="panelToggle" data-target="gateControls" aria-label="Toggle gate controls panel">−</button>
+                <span>Puertas</span>
+                <button class="panelToggle" data-target="gateControls" aria-label="Alternar panel de puertas">−</button>
             </div>
             <div class="panelBody">
                 <div class="controlRow">
@@ -101,7 +101,7 @@
                     <input type="number" id="gateY1Input" class="numInput" value="-200" step="50">
                     <span>Y2</span>
                     <input type="number" id="gateY2Input" class="numInput" value="200" step="50">
-                    <button id="addGateBtn">Add Gate</button>
+                    <button id="addGateBtn">Agregar puerta</button>
                 </div>
                 <div id="gateList"></div>
             </div>
@@ -109,8 +109,8 @@
 
         <div id="savedLevelsPanel" class="panel">
             <div class="panelHeader">
-                <span>Saved Levels</span>
-                <button class="panelToggle" data-target="savedLevelsPanel" aria-label="Toggle saved levels panel">−</button>
+                <span>Niveles guardados</span>
+                <button class="panelToggle" data-target="savedLevelsPanel" aria-label="Alternar panel de niveles guardados">−</button>
             </div>
             <div class="panelBody">
                 <div id="savedLevelsList" class="savedLevelButtons"></div>
@@ -121,14 +121,14 @@
 
 <div id="scoreDisplay">
     <div class="scoreRow">
-        <span>Total gates this run:</span> <span id="totalGatesCount">0</span>
+        <span>Puertas totales en esta ejecución:</span> <span id="totalGatesCount">0</span>
     </div>
     <div class="scoreRow">
-        <span style="color:lime;">Hits:</span> <span id="hitsCount">0</span>
+        <span style="color:lime;">Aciertos:</span> <span id="hitsCount">0</span>
     </div>
     <div id="hitsDots"></div>
     <div class="scoreRow">
-        <span style="color:red;">Misses:</span> <span id="missCount">0</span>
+        <span style="color:red;">Fallos:</span> <span id="missCount">0</span>
     </div>
     <div id="missDots"></div>
 </div>

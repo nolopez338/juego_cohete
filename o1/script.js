@@ -212,27 +212,27 @@ const gridSvg = document.getElementById("gridSvg");
 
 const savedLevels = [
     {
-        name: "Level 1 – Modo 1a",
+        name: "Nivel 1 – Modo 1a",
         gates: [
             { x: 5, y1: 10, y2: 20 }
         ]
     },
     {
-        name: "Level 2 – Modo 1b",
+        name: "Nivel 2 – Modo 1b",
         gates: [
             { x: 11, y1: 10, y2: 20 },
             { x: 22, y1: 19, y2: 31 }
         ]
     },
     {
-        name: "Level 3 – Modo 2a",
+        name: "Nivel 3 – Modo 2a",
         gates: [
             { x: 10, y1: 20, y2: 30 },
             { x: 20, y1: 50, y2: 60 }
         ]
     },
     {
-        name: "Level 4 – Modo 2b",
+        name: "Nivel 4 – Modo 2b",
         gates: [
             { x: 11, y1: 10, y2: 20 },
             { x: 22, y1: 20, y2: 30 },
@@ -240,7 +240,7 @@ const savedLevels = [
         ]
     },
     {
-        name: "Level 5 – Modo 3a",
+        name: "Nivel 5 – Modo 3a",
         gates: [
             { x: 10, y1: 10, y2: 20 },
             { x: 20, y1: 30, y2: 40 },
@@ -248,7 +248,7 @@ const savedLevels = [
         ]
     },
     {
-        name: "Level 6 – Modo 4a",
+        name: "Nivel 6 – Modo 4a",
         gates: [
             { x: 10, y1: 10, y2: 20 },
             { x: 20, y1: 30, y2: 40 },
@@ -505,7 +505,7 @@ function undoLastRocketTry() {
 
 function formatHitRatio(hits, misses) {
     const total = hits + misses;
-    if (!total) return "N/A";
+    if (!total) return "N/D";
 
     const proportion = (hits / total).toFixed(2);
     const percent = (hits / total * 100).toFixed(1);
@@ -563,12 +563,12 @@ function downloadStatsPdf() {
     const hits = scoreBoard.hits;
     const misses = scoreBoard.misses;
     const lines = [
-        "Session Statistics",
-        `Unique gate configurations: ${sessionStats.uniqueGateConfigs.size}`,
-        `Total rocket tries: ${sessionStats.totalRocketTries}`,
-        `Gates hit: ${hits}`,
-        `Gates missed: ${misses}`,
-        `Hit-to-total ratio: ${formatHitRatio(hits, misses)}`
+        "Estadísticas de la sesión",
+        `Configuraciones de puertas únicas: ${sessionStats.uniqueGateConfigs.size}`,
+        `Intentos de cohete totales: ${sessionStats.totalRocketTries}`,
+        `Puertas acertadas: ${hits}`,
+        `Puertas falladas: ${misses}`,
+        `Relación aciertos/total: ${formatHitRatio(hits, misses)}`
     ];
 
     const pdfString = buildStatsPdfContent(lines);
@@ -577,7 +577,7 @@ function downloadStatsPdf() {
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = "session-stats.pdf";
+    link.download = "estadisticas-sesion.pdf";
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -866,7 +866,7 @@ function renderGateList() {
 
     if (!gates.length) {
         const empty = document.createElement("div");
-        empty.textContent = "No gates yet.";
+        empty.textContent = "Aún no hay puertas.";
         empty.style.textAlign = "center";
         gateList.appendChild(empty);
         refreshPanelBodyHeight(gateControlsPanel);
@@ -898,7 +898,7 @@ function renderGateList() {
         y2Input.step = "50";
 
         const saveBtn = document.createElement("button");
-        saveBtn.textContent = "Save";
+        saveBtn.textContent = "Guardar";
         saveBtn.className = "saveBtn";
         saveBtn.onclick = () => {
             const x = parseFloat(xInput.value);
@@ -915,7 +915,7 @@ function renderGateList() {
         };
 
         const removeBtn = document.createElement("button");
-        removeBtn.textContent = "Remove";
+        removeBtn.textContent = "Eliminar";
         removeBtn.className = "removeBtn";
         removeBtn.onclick = () => {
             gates = gates.filter(g => g.id !== gate.id);
@@ -932,7 +932,7 @@ function renderGateList() {
             gate.showCoordinates = coordsToggle.checked;
             drawGates();
         };
-        toggleLabel.append(coordsToggle, document.createTextNode(" Show coords"));
+        toggleLabel.append(coordsToggle, document.createTextNode(" Mostrar coordenadas"));
 
         row.append(
             document.createTextNode("X:"),
@@ -954,12 +954,12 @@ function renderGateList() {
 
 function validateGateValues(x, y1, y2) {
     if ([x, y1, y2].some(v => Number.isNaN(v))) {
-        alert("Please enter numeric values for X, Y1, and Y2.");
+        alert("Introduce valores numéricos para X, Y1 y Y2.");
         return false;
     }
 
     if (y1 >= y2) {
-        alert("Gate requires Y1 < Y2 to form a gap.");
+        alert("La puerta requiere Y1 < Y2 para formar una abertura.");
         return false;
     }
 

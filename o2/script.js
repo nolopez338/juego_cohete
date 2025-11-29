@@ -1956,15 +1956,23 @@ function checkCollision(prevX, newX, prevDiffY, newDiffY) {
 
 }
 
+function isEditableTarget(target) {
+    if (!(target instanceof HTMLElement)) return false;
+
+    return target.matches("input, textarea") || target.isContentEditable;
+}
+
 // KEYS
 document.addEventListener("keydown", e => {
-    if (e.key === "Backspace") {
+    const editing = isEditableTarget(e.target);
+
+    if (!editing && e.key === "Backspace") {
         e.preventDefault();
         resetGame();
         return;
     }
 
-    if (e.key === "Delete") {
+    if (!editing && e.key === "Delete") {
         e.preventDefault();
         nextIteration();
         return;

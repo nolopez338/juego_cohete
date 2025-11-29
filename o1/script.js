@@ -5,6 +5,7 @@ const DEFAULT_ROCKET_SIZE = 1;
 
 const superMenu = document.getElementById("superMenu");
 const superMenuToggle = document.getElementById("superMenuToggle");
+const collapsedStartBtn = document.getElementById("collapsedStartBtn");
 const zoomContainer = document.getElementById("zoomContainer");
 const gateControlsPanel = document.getElementById("gateControls");
 const gateList = document.getElementById("gateList");
@@ -680,6 +681,10 @@ function setSuperMenuCollapsed(collapsed) {
     superMenuToggle.textContent = collapsed ? "›" : "‹";
     superMenuToggle.setAttribute("aria-expanded", (!collapsed).toString());
 
+    if (collapsedStartBtn) {
+        collapsedStartBtn.classList.toggle("visible", collapsed);
+    }
+
     if (!collapsed) {
         [topControlsPanel, generalConfigPanel, gateControlsPanel, savedLevelsPanel]
             .forEach(refreshPanelBodyHeight);
@@ -1303,6 +1308,10 @@ if (axisWidthSetBtn) {
 
 if (startBtn) {
     startBtn.addEventListener("click", armLaunch);
+}
+
+if (collapsedStartBtn) {
+    collapsedStartBtn.addEventListener("click", armLaunch);
 }
 
 function registerSlider(slider) {

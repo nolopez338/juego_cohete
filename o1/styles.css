@@ -261,6 +261,10 @@ body {
     flex-wrap: wrap;
 }
 
+.controlRow.actionRow {
+    margin-bottom: 12px;
+}
+
 .polynomialRow {
     flex-wrap: nowrap;
     gap: 8px;

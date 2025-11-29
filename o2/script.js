@@ -162,6 +162,7 @@ const axisWidthLabel = document.getElementById("axisWidthLabel");
 const axisWidthSlider = document.getElementById("axisWidthSlider");
 const axisWidthSetBtn = document.getElementById("axisWidthSetBtn");
 
+const startBtn = document.getElementById("startBtn");
 const resetBtn = document.getElementById("resetBtn");
 const restartBtn = document.getElementById("restartBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -357,6 +358,7 @@ let speed = 6;
 let facing = "right";
 let rocketAngle = 90;
 let rocketAngleB = 90;
+let launchEnabled = false;
 
 setRocketSize(rocketSize, false);
 setTrailWidth(trailStrokeWidth);
@@ -870,6 +872,16 @@ function setAxisWidth(value) {
         axisWidthSlider.value = clamped;
     }
     updateAxisStrokeStyles();
+}
+
+function armLaunch() {
+    launchEnabled = true;
+    facing = "right";
+    rocketAngle = 90;
+    rocketAngleB = 90;
+    updateRocketTransform();
+
+    launchRocket();
 }
 
 function updateAxisStrokeStyles() {
@@ -1473,6 +1485,10 @@ if (axisWidthSetBtn) {
     };
 }
 
+if (startBtn) {
+    startBtn.addEventListener("click", armLaunch);
+}
+
 function registerSlider(slider) {
     if (!slider) return;
 
@@ -2004,7 +2020,10 @@ document.addEventListener("keydown", e => {
 
     if (e.key === "ArrowLeft") rotateRocket("left");
     if (e.key === "ArrowRight") rotateRocket("right");
-    if (e.key === " ") launchRocket();
+    if (e.key === " ") {
+        if (!launchEnabled) return;
+        launchRocket();
+    }
 });
 
 renderSavedLevelButtons();
